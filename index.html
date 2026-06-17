@@ -30,22 +30,16 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg); color: var(--text); line-height: 1.5; -webkit-text-size-adjust: 100%;
   }
-  /* Full-height flex column so the active view fits the screen — only the
-     card/options area scrolls if a question is taller than the viewport. */
+  /* Natural document flow: the page scrolls when a question is taller than the
+     screen, so the Next button can always be scrolled fully into view above the
+     browser's bottom toolbar. (A fixed/clipped full-height layout pinned Next to
+     the bottom, where the toolbar covered it.) Compact sizing keeps most
+     questions on a single screen; the progress bar stays pinned at the top. */
   .wrap {
     max-width: 680px; margin: 0 auto;
-    padding: 8px 14px calc(14px + env(safe-area-inset-bottom, 0px));
-    /* svh = smallest viewport height: guarantees the column (incl. the Next button)
-       fits even when the mobile browser's toolbars are showing. */
-    height: 100vh; height: 100svh;
-    display: flex; flex-direction: column; overflow: hidden;
+    padding: 8px 14px calc(20px + env(safe-area-inset-bottom, 0px));
+    min-height: 100svh;
   }
-  header, .tabs, .toolbar { flex: 0 0 auto; }
-  section#tab-vocab, section#tab-book { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-  #quiz-screen, #fc-screen { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
-  .quiz-mid, .fc-mid { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
-  .next-row, .fc-controls { flex: 0 0 auto; }
-  #results-screen, #fc-done { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
   header { text-align: center; margin: 2px 0 8px; }
   header h1 { font-size: 1.05rem; margin: 0 0 2px; font-weight: 700; }
@@ -61,8 +55,8 @@
   .tab.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 
   /* ---------- Toolbar ---------- */
-  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px; }
-  .toolbar button { flex: 0 0 auto; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 8px; }
+  .toolbar button { flex: 0 0 auto; padding: 8px 11px; font-size: 0.92rem; }
   #btn-flip {
     background: var(--accent); border-color: var(--accent); color: var(--accent-text);
     font-weight: 700; letter-spacing: 0.01em;
@@ -85,7 +79,8 @@
   /* ---------- Progress bar ---------- */
   .progress-row {
     display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
-    font-size: 0.85rem; color: var(--muted); padding: 4px 0;
+    font-size: 0.85rem; color: var(--muted);
+    position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 6px 0;
   }
   .progress-track { flex: 1; height: 8px; background: var(--card-border); border-radius: 99px; overflow: hidden; }
   .progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.25s ease; }
@@ -94,9 +89,9 @@
   /* ---------- Prompt / cards ---------- */
   .card {
     background: var(--card); border: 1px solid var(--card-border); border-radius: 16px;
-    box-shadow: var(--shadow); padding: 16px 16px; text-align: center; margin-bottom: 12px;
+    box-shadow: var(--shadow); padding: 13px 14px; text-align: center; margin-bottom: 10px;
   }
-  .prompt-cn { font-size: 3.4rem; line-height: 1.1; font-weight: 600; letter-spacing: 0.02em; margin: 2px 0 4px; word-break: break-word; }
+  .prompt-cn { font-size: 3.1rem; line-height: 1.1; font-weight: 600; letter-spacing: 0.02em; margin: 2px 0 4px; word-break: break-word; }
   .prompt-py { font-size: 1.25rem; color: var(--muted); margin-bottom: 2px; }
   .prompt-en { font-size: 2rem; font-weight: 600; margin: 4px 0; word-break: break-word; }
   .prompt-pos {
@@ -105,10 +100,10 @@
   }
 
   /* ---------- Options ---------- */
-  .options { display: grid; gap: 8px; }
+  .options { display: grid; gap: 7px; }
   .opt {
     width: 100%; text-align: left; background: var(--opt-bg); border: 1.5px solid var(--opt-border);
-    color: var(--text); border-radius: 12px; padding: 11px 14px; cursor: pointer;
+    color: var(--text); border-radius: 12px; padding: 10px 14px; cursor: pointer;
     transition: background 0.12s ease, border-color 0.12s ease, transform 0.05s ease;
     display: flex; align-items: center; gap: 12px;
   }
