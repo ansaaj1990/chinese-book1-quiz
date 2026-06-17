@@ -585,8 +585,8 @@ function renderOptions(word) {
     if (direction === "cn2en") {
       btn.innerHTML = num + '<span class="label-en">' + escapeHtml(opt.en) + '</span>';
     } else {
-      btn.innerHTML = num + '<span class="label-cn">' + escapeHtml(opt.cn) +
-        '<small>' + escapeHtml(opt.py) + '</small></span>';
+      // English → Chinese: show characters only (no pinyin) so it tests recognition.
+      btn.innerHTML = num + '<span class="label-cn">' + escapeHtml(opt.cn) + '</span>';
     }
     btn.addEventListener("click", () => handleAnswer(btn, opt, word));
     box.appendChild(btn);
