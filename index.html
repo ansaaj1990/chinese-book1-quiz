@@ -25,6 +25,8 @@
     }
   }
   * { box-sizing: border-box; }
+  /* Scale the whole UI down to ~70%. Raise toward 100% for larger text. */
+  html { font-size: 70%; }
   html, body { margin: 0; padding: 0; height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -88,8 +90,8 @@
 
   /* ---------- Prompt / cards ---------- */
   .card {
-    background: var(--card); border: 1px solid var(--card-border); border-radius: 16px;
-    box-shadow: var(--shadow); padding: 13px 14px; text-align: center; margin-bottom: 10px;
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px;
+    box-shadow: var(--shadow); padding: 9px 11px; text-align: center; margin-bottom: 7px;
   }
   .prompt-cn { font-size: 3.1rem; line-height: 1.1; font-weight: 600; letter-spacing: 0.02em; margin: 2px 0 4px; word-break: break-word; }
   .prompt-py { font-size: 1.25rem; color: var(--muted); margin-bottom: 2px; }
@@ -100,10 +102,10 @@
   }
 
   /* ---------- Options ---------- */
-  .options { display: grid; gap: 7px; }
+  .options { display: grid; gap: 6px; }
   .opt {
     width: 100%; text-align: left; background: var(--opt-bg); border: 1.5px solid var(--opt-border);
-    color: var(--text); border-radius: 12px; padding: 10px 14px; cursor: pointer;
+    color: var(--text); border-radius: 11px; padding: 8px 12px; cursor: pointer;
     transition: background 0.12s ease, border-color 0.12s ease, transform 0.05s ease;
     display: flex; align-items: center; gap: 12px;
   }
