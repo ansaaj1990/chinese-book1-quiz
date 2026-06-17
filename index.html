@@ -142,7 +142,7 @@
   .fc-side-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
   .fc-cn { font-size: 3.6rem; line-height: 1.1; font-weight: 600; word-break: break-word; }
   .fc-en { font-size: 2.1rem; font-weight: 600; word-break: break-word; }
-  .fc-py { font-size: 1.3rem; color: var(--accent); font-weight: 600; }
+  .fc-py, .fc-py-rev { font-size: 1.3rem; color: var(--accent); font-weight: 600; }
   .fc-pos { font-size: 0.78rem; color: var(--muted); }
   .fc-divider { border: none; border-top: 1px dashed var(--card-border); margin: 8px auto; width: 80%; }
   .fc-controls { text-align: center; }
@@ -155,15 +155,16 @@
   .note { color: var(--muted); font-size: 0.82rem; text-align: center; margin: 10px 0; padding: 10px; border: 1px dashed var(--card-border); border-radius: 12px; }
   .hint { color: var(--muted); font-size: 0.72rem; margin-top: 14px; text-align: center; }
 
-  /* Pinyin show/hide is controlled globally by a body class */
+  /* Pinyin toggle hides pinyin only on the QUESTION side (prompt + flashcard front).
+     Answer reveals always show pinyin: feedback (.fb-py), flashcard back (.fc-py-rev),
+     and the missed-words review. */
   body.hide-pinyin .prompt-py,
-  body.hide-pinyin .fc-py,
-  body.hide-pinyin .fb-py { display: none !important; }
+  body.hide-pinyin .fc-py { display: none !important; }
 
   @media (max-height: 720px) {
     .prompt-cn, .fc-cn { font-size: 2.7rem; }
     .prompt-en, .fc-en { font-size: 1.7rem; }
-    .prompt-py, .fc-py { font-size: 1.1rem; }
+    .prompt-py, .fc-py, .fc-py-rev { font-size: 1.1rem; }
     .card { padding: 12px 14px; margin-bottom: 10px; }
     .opt { padding: 9px 12px; }
     .opt .label-cn { font-size: 1.6rem; }
@@ -478,7 +479,9 @@ function handleAnswer(btn, chosen, correct) {
   if (isRight) {
     btn.classList.add("correct");
     correctCount++;
-    fb.textContent = "Correct";
+    // Always reveal the word's pinyin on a correct answer, even if pinyin is toggled off.
+    fb.innerHTML = "Correct ✓ &nbsp; <strong>" + escapeHtml(correct.cn) + "</strong> · " +
+      escapeHtml(correct.py);
     fb.className = "feedback ok";
   } else {
     btn.classList.add("wrong");
@@ -609,13 +612,15 @@ function fcReveal() {
   const card = document.getElementById("fc-card");
   let back;
   if (direction === "cn2en") {
+    // Reveal: English + pinyin (always shown, so the reading is confirmed even if pinyin is off).
     back = '<div class="fc-side-label">English</div>' +
            '<div class="fc-en">' + escapeHtml(w.en) + '</div>' +
+           '<div class="fc-py-rev">' + escapeHtml(w.py) + '</div>' +
            '<div class="fc-pos">' + escapeHtml(w.pos) + '</div>';
   } else {
     back = '<div class="fc-side-label">Chinese</div>' +
            '<div class="fc-cn">' + escapeHtml(w.cn) + '</div>' +
-           '<div class="fc-py">' + escapeHtml(w.py) + '</div>';
+           '<div class="fc-py-rev">' + escapeHtml(w.py) + '</div>';
   }
   card.innerHTML += '<hr class="fc-divider">' + back;
   document.getElementById("fc-show").style.display = "none";
