@@ -155,6 +155,10 @@
   .fc-en { font-size: 2.1rem; font-weight: 600; word-break: break-word; }
   .fc-py, .fc-py-rev { font-size: 1.3rem; color: var(--accent); font-weight: 600; }
   .fc-pos { font-size: 0.78rem; color: var(--muted); }
+  /* Sentence-sized text for the Whole-Book Review deck */
+  .fc-cn-s { font-size: 2.2rem; line-height: 1.45; font-weight: 600; word-break: break-word; }
+  .fc-en-s { font-size: 1.55rem; line-height: 1.4; font-weight: 600; word-break: break-word; }
+  .fc-lesson { font-size: 0.72rem; color: var(--accent); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 4px; }
   .fc-divider { border: none; border-top: 1px dashed var(--card-border); margin: 8px auto; width: 80%; }
   .fc-controls { text-align: center; }
   .fc-grade { display: flex; gap: 10px; justify-content: center; }
@@ -175,6 +179,8 @@
   @media (max-height: 720px) {
     .prompt-cn, .fc-cn { font-size: 2.7rem; }
     .prompt-en, .fc-en { font-size: 1.7rem; }
+    .fc-cn-s { font-size: 1.8rem; }
+    .fc-en-s { font-size: 1.3rem; }
     .prompt-py, .fc-py, .fc-py-rev { font-size: 1.1rem; }
     .card { padding: 12px 14px; margin-bottom: 10px; }
     .opt { padding: 9px 12px; }
@@ -246,7 +252,7 @@
   <section id="tab-book" style="display:none;">
     <div id="fc-screen">
       <div class="progress-row">
-        <span class="mode-tag">Flashcards</span>
+        <span class="mode-tag">Sentences</span>
         <div class="progress-track"><div class="progress-fill" id="fc-fill"></div></div>
         <span id="fc-progress"></span>
       </div>
@@ -358,6 +364,61 @@ const VOCAB = [
   { cn: "下午好",       py: "xià wǔ hǎo",              en: "good afternoon",    pos: "Greeting" },
   { cn: "晚上好",       py: "wǎn shang hǎo",           en: "good evening",      pos: "Greeting" },
   { cn: "不",           py: "bù",                      en: "not",               pos: "Adverb" }
+];
+
+/* ============================================================
+   WHOLE-BOOK SENTENCES — key patterns, dialogue lines & phrases
+   from each lesson of Chinese Book 1 (A1). {cn, py, en, lesson}
+   Edit/extend here; the "Whole-Book Review" tab uses this list.
+   ============================================================ */
+const BOOK_SENTENCES = [
+  // Lesson 1 — 我是沙特人 / I am Saudi
+  { cn: "你好，我叫阿里。",           py: "nǐ hǎo, wǒ jiào Ālǐ.",                en: "Hello, my name is Ali.",            lesson: 1 },
+  { cn: "你是哪国人？",               py: "nǐ shì nǎ guó rén?",                  en: "Which country are you from?",       lesson: 1 },
+  { cn: "你是沙特人吗？",             py: "nǐ shì Shātè rén ma?",                en: "Are you Saudi?",                    lesson: 1 },
+  { cn: "我是中国人。",               py: "wǒ shì Zhōngguó rén.",                en: "I am Chinese.",                     lesson: 1 },
+  { cn: "你呢？",                     py: "nǐ ne?",                              en: "And you? / What about you?",        lesson: 1 },
+  { cn: "很高兴认识你！",             py: "hěn gāo xìng rèn shi nǐ!",            en: "Nice to meet you!",                 lesson: 1 },
+  // Lesson 2 — 我在第二出口 / I am at exit 2
+  { cn: "你在哪儿？",                 py: "nǐ zài nǎr?",                         en: "Where are you?",                    lesson: 2 },
+  { cn: "我在12出口。",               py: "wǒ zài 12 chūkǒu.",                   en: "I'm at exit 12.",                   lesson: 2 },
+  { cn: "这是阿里。",                 py: "zhè shì Ālǐ.",                        en: "This is Ali.",                      lesson: 2 },
+  { cn: "阿里在哪儿？",               py: "Ālǐ zài nǎr?",                        en: "Where is Ali?",                     lesson: 2 },
+  // Lesson 3 — 你喜欢吃什么？ / What do you like to eat?
+  { cn: "你喜欢吃什么？",             py: "nǐ xǐhuan chī shénme?",               en: "What do you like to eat?",          lesson: 3 },
+  { cn: "我喜欢吃火锅。",             py: "wǒ xǐhuan chī huǒguō.",               en: "I like to eat hot pot.",            lesson: 3 },
+  { cn: "你喜欢吃中国菜吗？",         py: "nǐ xǐhuan chī Zhōngguó cài ma?",      en: "Do you like Chinese food?",         lesson: 3 },
+  { cn: "这是什么？",                 py: "zhè shì shénme?",                     en: "What is this?",                     lesson: 3 },
+  { cn: "你叫什么名字？",             py: "nǐ jiào shénme míngzi?",              en: "What's your name?",                 lesson: 3 },
+  // Lesson 4 — 沙特人很喜欢喝茶 / Saudis love tea
+  { cn: "你也喜欢喝咖啡吗？",         py: "nǐ yě xǐhuan hē kāfēi ma?",           en: "Do you also like to drink coffee?", lesson: 4 },
+  { cn: "我不喜欢喝咖啡，我喜欢喝茶。", py: "wǒ bù xǐhuan hē kāfēi, wǒ xǐhuan hē chá.", en: "I don't like coffee; I like tea.", lesson: 4 },
+  { cn: "咖啡、奶茶我都喜欢。",       py: "kāfēi, nǎichá wǒ dōu xǐhuan.",        en: "I like both coffee and milk tea.",  lesson: 4 },
+  { cn: "早上好！",                   py: "zǎoshang hǎo!",                       en: "Good morning!",                     lesson: 4 },
+  // Lesson 6 — 你有微信吗？ / Do you have WeChat?
+  { cn: "你有微信吗？",               py: "nǐ yǒu wēixìn ma?",                   en: "Do you have WeChat?",               lesson: 6 },
+  { cn: "我有微信，微信很方便。",     py: "wǒ yǒu wēixìn, wēixìn hěn fāngbiàn.", en: "I have WeChat; it's very convenient.", lesson: 6 },
+  { cn: "我们加个微信吧！",           py: "wǒmen jiā gè wēixìn ba!",             en: "Let's add each other on WeChat!",   lesson: 6 },
+  { cn: "好久不见！",                 py: "hǎo jiǔ bú jiàn!",                    en: "Long time no see!",                 lesson: 6 },
+  // Lesson 7 — 我想去超市 / I want to go to the supermarket
+  { cn: "今天我请你吃饭。",           py: "jīntiān wǒ qǐng nǐ chīfàn.",          en: "Today I'll treat you to a meal.",   lesson: 7 },
+  { cn: "你想吃什么？",               py: "nǐ xiǎng chī shénme?",                en: "What do you want to eat?",          lesson: 7 },
+  { cn: "我想去超市。",               py: "wǒ xiǎng qù chāoshì.",                en: "I want to go to the supermarket.",  lesson: 7 },
+  { cn: "太好了！",                   py: "tài hǎo le!",                         en: "Great! / Wonderful!",               lesson: 7 },
+  { cn: "我和你一起去。",             py: "wǒ hé nǐ yìqǐ qù.",                   en: "I'll go together with you.",        lesson: 7 },
+  // Lesson 8 — 她是谁 / Who is she
+  { cn: "她是谁？",                   py: "tā shì shéi?",                        en: "Who is she?",                       lesson: 8 },
+  { cn: "她是我的女朋友。",           py: "tā shì wǒ de nǚpéngyou.",             en: "She is my girlfriend.",             lesson: 8 },
+  { cn: "这是我爸爸，这是我妈妈。",   py: "zhè shì wǒ bàba, zhè shì wǒ māma.",   en: "This is my dad; this is my mom.",   lesson: 8 },
+  { cn: "他们都在吉达。",             py: "tāmen dōu zài Jídá.",                 en: "They are all in Jeddah.",           lesson: 8 },
+  { cn: "她好漂亮！",                 py: "tā hǎo piàoliang!",                   en: "She's so beautiful!",               lesson: 8 },
+  // Lesson 9 — 商场前面有一家星巴克 / There's a Starbucks in front of the mall
+  { cn: "这儿有商场吗？",             py: "zhèr yǒu shāngchǎng ma?",             en: "Is there a mall here?",             lesson: 9 },
+  { cn: "公司后面有一个商场。",       py: "gōngsī hòumiàn yǒu yí gè shāngchǎng.", en: "There's a mall behind the company.", lesson: 9 },
+  { cn: "商场前面有一个星巴克。",     py: "shāngchǎng qiánmiàn yǒu yí gè Xīngbākè.", en: "There's a Starbucks in front of the mall.", lesson: 9 },
+  { cn: "我很想去那儿。",             py: "wǒ hěn xiǎng qù nàr.",                en: "I really want to go there.",        lesson: 9 },
+  { cn: "谢谢你请我吃饭。",           py: "xièxie nǐ qǐng wǒ chīfàn.",           en: "Thank you for treating me to a meal.", lesson: 9 },
+  { cn: "不客气。",                   py: "bú kèqi.",                            en: "You're welcome.",                   lesson: 9 }
 ];
 
 /* ============================================================
@@ -573,11 +634,11 @@ function mkBtn(label, cls, onClick) {
 let fcDeck = [], fcNext = [], fcIndex = 0, fcMastered = 0, fcTotal = 0, fcRevealed = false;
 
 function fcStart() {
-  fcDeck = shuffle(VOCAB);
+  fcDeck = shuffle(BOOK_SENTENCES);
   fcNext = [];
   fcIndex = 0;
   fcMastered = 0;
-  fcTotal = VOCAB.length;
+  fcTotal = BOOK_SENTENCES.length;
   document.getElementById("fc-done").style.display = "none";
   document.getElementById("fc-screen").style.display = "block";
   fcRender();
@@ -592,40 +653,37 @@ function fcRender() {
     if (fcNext.length > 0) { fcDeck = fcNext; fcNext = []; fcIndex = 0; }
     else { fcFinish(); return; }
   }
-  const w = fcDeck[fcIndex];
-  const card = document.getElementById("fc-card");
+  const s = fcDeck[fcIndex];
+  const tag = '<div class="fc-lesson">Lesson ' + s.lesson + '</div>';
+  let front;
   if (direction === "cn2en") {
-    card.innerHTML =
-      '<div class="fc-side-label">Chinese</div>' +
-      '<div class="fc-cn">' + escapeHtml(w.cn) + '</div>' +
-      '<div class="fc-py">' + escapeHtml(w.py) + '</div>';
+    front = tag + '<div class="fc-side-label">Read the Chinese — recall the meaning</div>' +
+      '<div class="fc-cn-s">' + escapeHtml(s.cn) + '</div>' +
+      '<div class="fc-py">' + escapeHtml(s.py) + '</div>';
   } else {
-    card.innerHTML =
-      '<div class="fc-side-label">English</div>' +
-      '<div class="fc-en">' + escapeHtml(w.en) + '</div>' +
-      '<div class="fc-pos">' + escapeHtml(w.pos) + '</div>';
+    front = tag + '<div class="fc-side-label">Say this in Chinese</div>' +
+      '<div class="fc-en-s">' + escapeHtml(s.en) + '</div>';
   }
+  document.getElementById("fc-card").innerHTML = front;
   fcProgress();
 }
 
 function fcReveal() {
   if (fcRevealed) return;
   fcRevealed = true;
-  const w = fcDeck[fcIndex];
-  const card = document.getElementById("fc-card");
+  const s = fcDeck[fcIndex];
   let back;
   if (direction === "cn2en") {
-    // Reveal: English + pinyin (always shown, so the reading is confirmed even if pinyin is off).
-    back = '<div class="fc-side-label">English</div>' +
-           '<div class="fc-en">' + escapeHtml(w.en) + '</div>' +
-           '<div class="fc-py-rev">' + escapeHtml(w.py) + '</div>' +
-           '<div class="fc-pos">' + escapeHtml(w.pos) + '</div>';
+    // Reveal meaning + pinyin (always shown, so the reading is confirmed even if pinyin is off).
+    back = '<div class="fc-side-label">Meaning</div>' +
+           '<div class="fc-en-s">' + escapeHtml(s.en) + '</div>' +
+           '<div class="fc-py-rev">' + escapeHtml(s.py) + '</div>';
   } else {
     back = '<div class="fc-side-label">Chinese</div>' +
-           '<div class="fc-cn">' + escapeHtml(w.cn) + '</div>' +
-           '<div class="fc-py-rev">' + escapeHtml(w.py) + '</div>';
+           '<div class="fc-cn-s">' + escapeHtml(s.cn) + '</div>' +
+           '<div class="fc-py-rev">' + escapeHtml(s.py) + '</div>';
   }
-  card.innerHTML += '<hr class="fc-divider">' + back;
+  document.getElementById("fc-card").innerHTML += '<hr class="fc-divider">' + back;
   document.getElementById("fc-show").style.display = "none";
   document.getElementById("fc-grade").style.display = "flex";
 }
