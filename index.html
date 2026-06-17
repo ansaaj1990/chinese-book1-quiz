@@ -162,6 +162,7 @@
   .fc-lesson { font-size: 0.72rem; color: var(--accent); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 4px; }
   /* Fill-in-the-blank (exam format) */
   .cloze-sentence { font-size: 2rem; line-height: 1.55; font-weight: 600; word-break: break-word; }
+  .cloze-py { font-size: 1.05rem; color: var(--accent); font-weight: 600; margin-top: 4px; }
   .cloze-hint { font-size: 0.95rem; color: var(--muted); margin-top: 6px; }
   .blank {
     display: inline-block; min-width: 1.5em; text-align: center; font-weight: 700;
@@ -184,7 +185,8 @@
      Answer reveals always show pinyin: feedback (.fb-py), flashcard back (.fc-py-rev),
      and the missed-words review. */
   body.hide-pinyin .prompt-py,
-  body.hide-pinyin .fc-py { display: none !important; }
+  body.hide-pinyin .fc-py,
+  body.hide-pinyin .cloze-py { display: none !important; }
 
   @media (max-height: 720px) {
     .prompt-cn, .fc-cn { font-size: 2.7rem; }
@@ -466,34 +468,34 @@ const BOOK_SENTENCES = [
    a word that exists in VOCAB (for clean distractors).
    ============================================================ */
 const CLOZE = [
-  { cn: "你是哪国人？",             blank: "哪",     en: "Which country are you from?" },
-  { cn: "我是中国人。",             blank: "人",     en: "I am Chinese." },
-  { cn: "很高兴认识你！",           blank: "很",     en: "Nice to meet you!" },
-  { cn: "你是沙特人吗？",           blank: "是",     en: "Are you Saudi?" },
-  { cn: "你在哪儿？",               blank: "在",     en: "Where are you?" },
-  { cn: "这是阿里。",               blank: "是",     en: "This is Ali." },
-  { cn: "你喜欢吃什么？",           blank: "吃",     en: "What do you like to eat?" },
-  { cn: "我喜欢吃火锅。",           blank: "火锅",   en: "I like to eat hot pot." },
-  { cn: "你喜欢吃中国菜吗？",       blank: "喜欢",   en: "Do you like Chinese food?" },
-  { cn: "这是什么？",               blank: "什么",   en: "What is this?" },
-  { cn: "我不喜欢喝咖啡。",         blank: "喝",     en: "I don't like to drink coffee." },
-  { cn: "我喜欢喝茶。",             blank: "茶",     en: "I like to drink tea." },
-  { cn: "我不喜欢喝奶茶。",         blank: "不",     en: "I don't like to drink milk tea." },
-  { cn: "你有微信吗？",             blank: "有",     en: "Do you have WeChat?" },
-  { cn: "微信很方便。",             blank: "方便",   en: "WeChat is very convenient." },
-  { cn: "我想去超市。",             blank: "想",     en: "I want to go to the supermarket." },
-  { cn: "今天我请你吃饭。",         blank: "吃",     en: "Today I'll treat you to a meal." },
-  { cn: "我和你一起去。",           blank: "去",     en: "I'll go together with you." },
-  { cn: "太好了！",                 blank: "太",     en: "Great! / Wonderful!" },
-  { cn: "她是我的女朋友。",         blank: "女朋友", en: "She is my girlfriend." },
-  { cn: "这是我爸爸，这是我妈妈。", blank: "爸爸",   en: "This is my dad, this is my mom." },
-  { cn: "她很漂亮。",               blank: "很",     en: "She is very beautiful." },
-  { cn: "这儿有商场吗？",           blank: "商场",   en: "Is there a mall here?" },
-  { cn: "商场前面有一个星巴克。",   blank: "前面",   en: "There's a Starbucks in front of the mall." },
-  { cn: "公司后面有一个商场。",     blank: "后面",   en: "There's a mall behind the company." },
-  { cn: "谢谢你请我吃饭。",         blank: "谢谢",   en: "Thank you for treating me to a meal." },
-  { cn: "我也喜欢吃火锅。",         blank: "也",     en: "I also like to eat hot pot." },
-  { cn: "早上好！",                 blank: "早",     en: "Good morning!" }
+  { cn: "你是哪国人？",             blank: "哪",     py: "nǐ shì ___ guó rén?",            en: "Which country are you from?" },
+  { cn: "我是中国人。",             blank: "人",     py: "wǒ shì Zhōngguó ___.",           en: "I am Chinese." },
+  { cn: "很高兴认识你！",           blank: "很",     py: "___ gāoxìng rènshi nǐ!",         en: "Nice to meet you!" },
+  { cn: "你是沙特人吗？",           blank: "是",     py: "nǐ ___ Shātè rén ma?",           en: "Are you Saudi?" },
+  { cn: "你在哪儿？",               blank: "在",     py: "nǐ ___ nǎr?",                    en: "Where are you?" },
+  { cn: "这是阿里。",               blank: "是",     py: "zhè ___ Ālǐ.",                   en: "This is Ali." },
+  { cn: "你喜欢吃什么？",           blank: "吃",     py: "nǐ xǐhuan ___ shénme?",          en: "What do you like to eat?" },
+  { cn: "我喜欢吃火锅。",           blank: "火锅",   py: "wǒ xǐhuan chī ___.",             en: "I like to eat hot pot." },
+  { cn: "你喜欢吃中国菜吗？",       blank: "喜欢",   py: "nǐ ___ chī Zhōngguó cài ma?",    en: "Do you like Chinese food?" },
+  { cn: "这是什么？",               blank: "什么",   py: "zhè shì ___?",                   en: "What is this?" },
+  { cn: "我不喜欢喝咖啡。",         blank: "喝",     py: "wǒ bù xǐhuan ___ kāfēi.",        en: "I don't like to drink coffee." },
+  { cn: "我喜欢喝茶。",             blank: "茶",     py: "wǒ xǐhuan hē ___.",              en: "I like to drink tea." },
+  { cn: "我不喜欢喝奶茶。",         blank: "不",     py: "wǒ ___ xǐhuan hē nǎichá.",       en: "I don't like to drink milk tea." },
+  { cn: "你有微信吗？",             blank: "有",     py: "nǐ ___ wēixìn ma?",              en: "Do you have WeChat?" },
+  { cn: "微信很方便。",             blank: "方便",   py: "wēixìn hěn ___.",                en: "WeChat is very convenient." },
+  { cn: "我想去超市。",             blank: "想",     py: "wǒ ___ qù chāoshì.",             en: "I want to go to the supermarket." },
+  { cn: "今天我请你吃饭。",         blank: "吃",     py: "jīntiān wǒ qǐng nǐ ___ fàn.",    en: "Today I'll treat you to a meal." },
+  { cn: "我和你一起去。",           blank: "去",     py: "wǒ hé nǐ yìqǐ ___.",             en: "I'll go together with you." },
+  { cn: "太好了！",                 blank: "太",     py: "___ hǎo le!",                    en: "Great! / Wonderful!" },
+  { cn: "她是我的女朋友。",         blank: "女朋友", py: "tā shì wǒ de ___.",              en: "She is my girlfriend." },
+  { cn: "这是我爸爸，这是我妈妈。", blank: "爸爸",   py: "zhè shì wǒ ___, zhè shì wǒ māma.", en: "This is my dad, this is my mom." },
+  { cn: "她很漂亮。",               blank: "很",     py: "tā ___ piàoliang.",              en: "She is very beautiful." },
+  { cn: "这儿有商场吗？",           blank: "商场",   py: "zhèr yǒu ___ ma?",               en: "Is there a mall here?" },
+  { cn: "商场前面有一个星巴克。",   blank: "前面",   py: "shāngchǎng ___ yǒu yí gè Xīngbākè.", en: "There's a Starbucks in front of the mall." },
+  { cn: "公司后面有一个商场。",     blank: "后面",   py: "gōngsī ___ yǒu yí gè shāngchǎng.", en: "There's a mall behind the company." },
+  { cn: "谢谢你请我吃饭。",         blank: "谢谢",   py: "___ nǐ qǐng wǒ chīfàn.",         en: "Thank you for treating me to a meal." },
+  { cn: "我也喜欢吃火锅。",         blank: "也",     py: "wǒ ___ xǐhuan chī huǒguō.",      en: "I also like to eat hot pot." },
+  { cn: "早上好！",                 blank: "早",     py: "___ shang hǎo!",                 en: "Good morning!" }
 ];
 
 /* ============================================================
@@ -749,6 +751,7 @@ function clRender() {
   const blanked = escapeHtml(item.cn).replace(escapeHtml(item.blank), '<span class="blank"></span>');
   document.getElementById("cl-card").innerHTML =
     '<div class="cloze-sentence">' + blanked + '</div>' +
+    '<div class="cloze-py">' + escapeHtml(item.py) + '</div>' +
     '<div class="cloze-hint">' + escapeHtml(item.en) + '</div>';
   const box = document.getElementById("cl-options");
   box.innerHTML = "";
