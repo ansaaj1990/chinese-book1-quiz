@@ -3,269 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chinese Book 1 — Vocab Quiz</title>
+<title>Chinese Book 1 — Review</title>
 <style>
   /* ---------- Theme tokens (light default, dark via prefers-color-scheme) ---------- */
   :root {
-    --bg: #f4f5f7;
-    --card: #ffffff;
-    --card-border: #e2e5ea;
-    --text: #1b1d22;
-    --muted: #6b7280;
-    --accent: #5a9ba3;
-    --accent-text: #ffffff;
-    --opt-bg: #ffffff;
-    --opt-border: #d4d8df;
-    --opt-hover: #eef6f7;
-    --correct-bg: #e6f6ea;
-    --correct-border: #3ca35a;
-    --correct-text: #1d6b34;
-    --wrong-bg: #fdeaea;
-    --wrong-border: #d9534f;
-    --wrong-text: #a3302c;
+    --bg: #f4f5f7; --card: #ffffff; --card-border: #e2e5ea;
+    --text: #1b1d22; --muted: #6b7280; --accent: #5a9ba3; --accent-text: #ffffff;
+    --opt-bg: #ffffff; --opt-border: #d4d8df; --opt-hover: #eef6f7;
+    --correct-bg: #e6f6ea; --correct-border: #3ca35a; --correct-text: #1d6b34;
+    --wrong-bg: #fdeaea; --wrong-border: #d9534f; --wrong-text: #a3302c;
     --shadow: 0 6px 24px rgba(0,0,0,0.07);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #14161a;
-      --card: #1e2127;
-      --card-border: #2c3038;
-      --text: #f0f2f5;
-      --muted: #9aa1ad;
-      --accent: #5fb0ba;
-      --accent-text: #0c1112;
-      --opt-bg: #23272e;
-      --opt-border: #353a43;
-      --opt-hover: #2b313a;
-      --correct-bg: #14331f;
-      --correct-border: #3ca35a;
-      --correct-text: #7ee29a;
-      --wrong-bg: #361a1a;
-      --wrong-border: #d9534f;
-      --wrong-text: #f0a3a0;
+      --bg: #14161a; --card: #1e2127; --card-border: #2c3038;
+      --text: #f0f2f5; --muted: #9aa1ad; --accent: #5fb0ba; --accent-text: #0c1112;
+      --opt-bg: #23272e; --opt-border: #353a43; --opt-hover: #2b313a;
+      --correct-bg: #14331f; --correct-border: #3ca35a; --correct-text: #7ee29a;
+      --wrong-bg: #361a1a; --wrong-border: #d9534f; --wrong-text: #f0a3a0;
       --shadow: 0 6px 24px rgba(0,0,0,0.4);
     }
   }
-
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-    -webkit-text-size-adjust: 100%;
+    background: var(--bg); color: var(--text); line-height: 1.5; -webkit-text-size-adjust: 100%;
   }
-  .wrap {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 10px 14px 14px;
-  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 10px 14px 14px; }
 
-  /* ---------- Header / toolbar ---------- */
   header { text-align: center; margin: 2px 0 8px; }
   header h1 { font-size: 1.05rem; margin: 0 0 2px; font-weight: 700; }
   header .sub { color: var(--muted); font-size: 0.78rem; }
 
-  .toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 10px;
+  /* ---------- Tabs ---------- */
+  .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+  .tab {
+    flex: 1 1 0; padding: 10px 8px; border: 1.5px solid var(--opt-border);
+    background: var(--opt-bg); color: var(--muted); border-radius: 12px;
+    font: inherit; font-weight: 700; cursor: pointer; line-height: 1.2;
   }
-  .toolbar button {
-    flex: 0 0 auto;
-  }
-  /* Flip button: make the quiz direction obvious and prominent */
+  .tab.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px; }
+  .toolbar button { flex: 0 0 auto; }
   #btn-flip {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-text);
-    font-weight: 700;
-    letter-spacing: 0.01em;
+    background: var(--accent); border-color: var(--accent); color: var(--accent-text);
+    font-weight: 700; letter-spacing: 0.01em;
   }
   #btn-flip:hover { filter: brightness(1.06); background: var(--accent); }
   #btn-flip .swap { opacity: 0.85; font-weight: 400; }
+  #btn-pinyin.off { opacity: 0.7; }
 
   /* ---------- Share / QR panel ---------- */
-  #share-panel { margin: 0 0 18px; }
+  #share-panel { margin: 0 0 12px; }
   .share-card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 18px;
-    text-align: center;
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 18px; text-align: center;
   }
   .share-title { font-weight: 700; margin-bottom: 12px; }
-  .qr {
-    width: 220px;
-    max-width: 70vw;
-    height: auto;
-    image-rendering: pixelated;   /* keep QR crisp when scaled up */
-    background: #fff;             /* light quiet zone so it scans in dark mode */
-    padding: 8px;
-    border-radius: 8px;
-  }
-  .share-link {
-    display: block;
-    margin: 12px 0;
-    color: var(--accent);
-    font-weight: 600;
-    word-break: break-all;
-    text-decoration: none;
-  }
+  .qr { width: 220px; max-width: 70vw; height: auto; image-rendering: pixelated; background: #fff; padding: 8px; border-radius: 8px; }
+  .share-link { display: block; margin: 12px 0; color: var(--accent); font-weight: 600; word-break: break-all; text-decoration: none; }
   .share-link:hover { text-decoration: underline; }
 
   /* ---------- Progress bar ---------- */
   .progress-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    font-size: 0.85rem;
-    color: var(--muted);
-    position: sticky;          /* stays visible — no scrolling up to see progress */
-    top: 0;
-    z-index: 5;
-    background: var(--bg);
-    padding: 8px 0;
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    font-size: 0.85rem; color: var(--muted);
+    position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 8px 0;
   }
-  .progress-track {
-    flex: 1;
-    height: 8px;
-    background: var(--card-border);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--accent);
-    border-radius: 99px;
-    transition: width 0.25s ease;
-  }
-  .mode-tag {
-    font-weight: 600;
-    color: var(--accent);
-    white-space: nowrap;
-  }
+  .progress-track { flex: 1; height: 8px; background: var(--card-border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.25s ease; }
+  .mode-tag { font-weight: 600; color: var(--accent); white-space: nowrap; }
 
-  /* ---------- Prompt card ---------- */
+  /* ---------- Prompt / cards ---------- */
   .card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 16px 16px;
-    text-align: center;
-    margin-bottom: 12px;
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 16px 16px; text-align: center; margin-bottom: 12px;
   }
-  .prompt-cn {
-    font-size: 3.4rem;
-    line-height: 1.1;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    margin: 2px 0 4px;
-    word-break: break-word;
-  }
-  .prompt-py {
-    font-size: 1.25rem;
-    color: var(--muted);
-    margin-bottom: 2px;
-  }
-  .prompt-en {
-    font-size: 2rem;
-    font-weight: 600;
-    margin: 4px 0;
-    word-break: break-word;
-  }
+  .prompt-cn { font-size: 3.4rem; line-height: 1.1; font-weight: 600; letter-spacing: 0.02em; margin: 2px 0 4px; word-break: break-word; }
+  .prompt-py { font-size: 1.25rem; color: var(--muted); margin-bottom: 2px; }
+  .prompt-en { font-size: 2rem; font-weight: 600; margin: 4px 0; word-break: break-word; }
   .prompt-pos {
-    display: inline-block;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    border: 1px solid var(--card-border);
-    border-radius: 99px;
-    padding: 2px 10px;
-    margin-top: 6px;
+    display: inline-block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); border: 1px solid var(--card-border); border-radius: 99px; padding: 2px 10px; margin-top: 6px;
   }
 
   /* ---------- Options ---------- */
   .options { display: grid; gap: 8px; }
   .opt {
-    width: 100%;
-    text-align: left;
-    background: var(--opt-bg);
-    border: 1.5px solid var(--opt-border);
-    color: var(--text);
-    border-radius: 12px;
-    padding: 11px 14px;
-    cursor: pointer;
+    width: 100%; text-align: left; background: var(--opt-bg); border: 1.5px solid var(--opt-border);
+    color: var(--text); border-radius: 12px; padding: 11px 14px; cursor: pointer;
     transition: background 0.12s ease, border-color 0.12s ease, transform 0.05s ease;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    display: flex; align-items: center; gap: 12px;
   }
   .opt:hover:not(:disabled) { background: var(--opt-hover); }
   .opt:active:not(:disabled) { transform: scale(0.99); }
   .opt:disabled { cursor: default; }
-  .opt .num {
-    flex: 0 0 auto;
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    background: var(--card-border);
-    color: var(--text);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.85rem; font-weight: 700;
-  }
+  .opt .num { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: var(--card-border); color: var(--text); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; }
   .opt .label-en { font-size: 1.15rem; font-weight: 500; }
   .opt .label-cn { font-size: 1.85rem; font-weight: 600; line-height: 1.1; }
-  .opt .label-cn small { display: block; font-size: 0.95rem; font-weight: 400; color: var(--muted); margin-top: 1px; }
   .opt.correct { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-text); }
   .opt.correct .num { background: var(--correct-border); color: #fff; }
   .opt.wrong { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-text); }
   .opt.wrong .num { background: var(--wrong-border); color: #fff; }
 
-  /* ---------- Generic buttons ---------- */
-  button.btn {
-    font: inherit;
-    font-weight: 600;
-    border-radius: 12px;
-    padding: 10px 16px;
-    border: 1.5px solid var(--opt-border);
-    background: var(--opt-bg);
-    color: var(--text);
-    cursor: pointer;
-    transition: background 0.12s ease, transform 0.05s ease;
-  }
+  /* ---------- Buttons ---------- */
+  button.btn { font: inherit; font-weight: 600; border-radius: 12px; padding: 10px 14px; border: 1.5px solid var(--opt-border); background: var(--opt-bg); color: var(--text); cursor: pointer; transition: background 0.12s ease, transform 0.05s ease; }
   button.btn:hover { background: var(--opt-hover); }
   button.btn:active { transform: scale(0.98); }
-  button.btn.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-text);
-  }
+  button.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
   button.btn.primary:hover { filter: brightness(1.06); background: var(--accent); }
 
-  .next-row {
-    margin-top: 8px;
-    text-align: center;
-    position: sticky;          /* stays reachable — no scrolling down to hit Next */
-    bottom: 0;
-    z-index: 5;
-    background: var(--bg);
-    padding: 8px 0 4px;
-  }
+  .next-row { margin-top: 8px; text-align: center; position: sticky; bottom: 0; z-index: 5; background: var(--bg); padding: 8px 0 4px; }
   #btn-next { width: 100%; max-width: 340px; padding: 13px 16px; font-size: 1.05rem; }
-  .feedback {
-    text-align: center;
-    font-weight: 600;
-    min-height: 1.3em;
-    margin-top: 8px;
-  }
+  .feedback { text-align: center; font-weight: 600; min-height: 1.3em; margin-top: 8px; }
   .feedback.ok { color: var(--correct-text); }
   .feedback.no { color: var(--wrong-text); }
 
@@ -274,46 +127,43 @@
   .score-big { font-size: 3.4rem; font-weight: 800; margin: 6px 0; }
   .score-sub { color: var(--muted); margin-bottom: 8px; }
   .results-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0 8px; }
-
-  .missed-list {
-    text-align: left;
-    margin: 18px auto 0;
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    overflow: hidden;
-  }
-  .missed-list .head {
-    background: var(--opt-hover);
-    padding: 10px 16px;
-    font-weight: 700;
-    font-size: 0.9rem;
-  }
-  .missed-row {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 4px 14px;
-    padding: 12px 16px;
-    border-top: 1px solid var(--card-border);
-    align-items: baseline;
-  }
+  .missed-list { text-align: left; margin: 18px auto 0; border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; }
+  .missed-list .head { background: var(--opt-hover); padding: 10px 16px; font-weight: 700; font-size: 0.9rem; }
+  .missed-row { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; padding: 12px 16px; border-top: 1px solid var(--card-border); align-items: baseline; }
   .missed-row .mc-cn { font-size: 2rem; font-weight: 600; line-height: 1.15; }
   .missed-row .mc-meta { color: var(--muted); }
   .missed-row .mc-meta .py { color: var(--accent); font-weight: 600; }
   .missed-row .mc-meta .en { color: var(--text); }
-  .perfect {
-    font-size: 1.1rem;
-    color: var(--correct-text);
-    font-weight: 700;
-    margin-top: 14px;
-  }
-  .hint { color: var(--muted); font-size: 0.72rem; margin-top: 14px; text-align:center; }
-  .clean-badge { color: var(--correct-text); font-weight:700; }
+  .perfect { font-size: 1.1rem; color: var(--correct-text); font-weight: 700; margin-top: 14px; }
+  .clean-badge { color: var(--correct-text); font-weight: 700; }
 
-  /* On short screens, shrink further so the whole question fits without scrolling */
+  /* ---------- Flashcards (Whole-Book Review) ---------- */
+  .fc-card { min-height: 160px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+  .fc-side-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+  .fc-cn { font-size: 3.6rem; line-height: 1.1; font-weight: 600; word-break: break-word; }
+  .fc-en { font-size: 2.1rem; font-weight: 600; word-break: break-word; }
+  .fc-py { font-size: 1.3rem; color: var(--accent); font-weight: 600; }
+  .fc-pos { font-size: 0.78rem; color: var(--muted); }
+  .fc-divider { border: none; border-top: 1px dashed var(--card-border); margin: 8px auto; width: 80%; }
+  .fc-controls { text-align: center; }
+  .fc-grade { display: flex; gap: 10px; justify-content: center; }
+  .fc-grade .btn { flex: 1 1 0; max-width: 200px; padding: 13px; font-size: 1.02rem; }
+  #fc-show { width: 100%; max-width: 340px; padding: 13px 16px; font-size: 1.05rem; }
+  .btn.good { background: var(--correct-border); border-color: var(--correct-border); color: #fff; }
+  .btn.again { background: transparent; }
+
+  .note { color: var(--muted); font-size: 0.82rem; text-align: center; margin: 10px 0; padding: 10px; border: 1px dashed var(--card-border); border-radius: 12px; }
+  .hint { color: var(--muted); font-size: 0.72rem; margin-top: 14px; text-align: center; }
+
+  /* Pinyin show/hide is controlled globally by a body class */
+  body.hide-pinyin .prompt-py,
+  body.hide-pinyin .fc-py,
+  body.hide-pinyin .fb-py { display: none !important; }
+
   @media (max-height: 720px) {
-    .prompt-cn { font-size: 2.7rem; }
-    .prompt-en { font-size: 1.7rem; }
-    .prompt-py { font-size: 1.1rem; }
+    .prompt-cn, .fc-cn { font-size: 2.7rem; }
+    .prompt-en, .fc-en { font-size: 1.7rem; }
+    .prompt-py, .fc-py { font-size: 1.1rem; }
     .card { padding: 12px 14px; margin-bottom: 10px; }
     .opt { padding: 9px 12px; }
     .opt .label-cn { font-size: 1.6rem; }
@@ -325,17 +175,24 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Chinese Book 1 — Vocab Quiz</h1>
+    <h1>Chinese Book 1 — Review</h1>
     <div class="sub" id="subtitle"></div>
   </header>
 
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" id="tab-btn-vocab">📋 Vocabulary Review</button>
+    <button class="tab" id="tab-btn-book">📖 Whole-Book Review</button>
+  </div>
+
+  <!-- Global controls (apply to both tabs) -->
   <div class="toolbar">
     <button class="btn" id="btn-flip" title="Tap to switch quiz direction"></button>
-    <button class="btn" id="btn-restart">Restart all words</button>
+    <button class="btn" id="btn-pinyin" title="Show or hide pinyin"></button>
     <button class="btn" id="btn-share">Share / QR</button>
   </div>
 
-  <!-- Share panel (toggled by the Share button) -->
+  <!-- Share panel -->
   <div id="share-panel" style="display:none;">
     <div class="share-card">
       <div class="share-title">Scan to open on your phone</div>
@@ -345,40 +202,75 @@
     </div>
   </div>
 
-  <!-- Quiz screen -->
-  <div id="quiz-screen">
-    <div class="progress-row">
-      <span class="mode-tag" id="mode-tag"></span>
-      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-      <span id="progress-text"></span>
+  <!-- ================= TAB 1: VOCABULARY REVIEW (multiple choice) ================= -->
+  <section id="tab-vocab">
+    <div class="toolbar"><button class="btn" id="btn-restart">↻ Restart all words</button></div>
+
+    <div id="quiz-screen">
+      <div class="progress-row">
+        <span class="mode-tag" id="mode-tag"></span>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <span id="progress-text"></span>
+      </div>
+      <div class="card" id="prompt-card"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="next-row" id="next-row" style="display:none;">
+        <button class="btn primary" id="btn-next">Next →</button>
+      </div>
     </div>
 
-    <div class="card" id="prompt-card"></div>
-    <div class="options" id="options"></div>
-    <div class="feedback" id="feedback"></div>
-    <div class="next-row" id="next-row" style="display:none;">
-      <button class="btn primary" id="btn-next">Next →</button>
+    <div id="results-screen" style="display:none;">
+      <div class="results">
+        <div class="score-big" id="score-big"></div>
+        <div class="score-sub" id="score-sub"></div>
+        <div class="results-actions" id="results-actions"></div>
+        <div id="missed-container"></div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Results screen -->
-  <div id="results-screen" style="display:none;">
-    <div class="results">
-      <div class="score-big" id="score-big"></div>
-      <div class="score-sub" id="score-sub"></div>
-      <div class="results-actions" id="results-actions"></div>
-      <div id="missed-container"></div>
+  <!-- ================= TAB 2: WHOLE-BOOK REVIEW (flashcards) ================= -->
+  <section id="tab-book" style="display:none;">
+    <div class="toolbar"><button class="btn" id="fc-restart">↻ Restart / Shuffle</button></div>
+    <div class="note" id="book-note">
+      Flashcard self-test over the current word list. Tap <b>Show answer</b>, then mark
+      <b>Got it</b> or <b>Review again</b> — missed cards come back until you know them all.
+      <br>(Once you send the full book pages, this tab will also cover grammar, phrases &amp; dialogues.)
     </div>
-  </div>
 
-  <div class="hint">All vocab lives in the <code>VOCAB</code> array at the top of the &lt;script&gt; — edit it in one place. Works offline; just double-click.</div>
+    <div id="fc-screen">
+      <div class="progress-row">
+        <span class="mode-tag">Flashcards</span>
+        <div class="progress-track"><div class="progress-fill" id="fc-fill"></div></div>
+        <span id="fc-progress"></span>
+      </div>
+      <div class="card fc-card" id="fc-card"></div>
+      <div class="fc-controls">
+        <button class="btn primary" id="fc-show">Show answer</button>
+        <div class="fc-grade" id="fc-grade" style="display:none;">
+          <button class="btn again" id="fc-again">↻ Review again</button>
+          <button class="btn good" id="fc-got">✓ Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="fc-done" style="display:none;">
+      <div class="results">
+        <div class="perfect"><span class="clean-badge">✓ Deck complete — all cards mastered!</span></div>
+        <div class="results-actions">
+          <button class="btn primary" id="fc-again-all">Review all again</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="hint">Vocab lives in the <code>VOCAB</code> array at the top of the &lt;script&gt;. Works offline; just double-click.</div>
 </div>
 
 <script>
 /* ============================================================
-   WORD LIST  —  edit here.  One object per word.
-   cn = Chinese characters, py = pinyin, en = English,
-   pos = part of speech (used to pick believable wrong answers).
+   WORD LIST — edit here. {cn, py, en, pos}
    ============================================================ */
 const VOCAB = [
   { cn: "你好",         py: "nǐ hǎo",                  en: "hello",             pos: "Greeting" },
@@ -465,21 +357,13 @@ const VOCAB = [
 ];
 
 /* ============================================================
-   Quiz engine
+   Shared state
    ============================================================ */
+const QUIZ_URL = "https://ansaaj1990.github.io/chinese-book1-quiz/";
+let direction = "cn2en";   // "cn2en" or "en2cn" — shared by both tabs
+let showPinyin = true;
+let currentTab = "vocab";
 
-// ---- State ----
-let direction = "cn2en";   // "cn2en" or "en2cn"
-let queue = [];            // words remaining in the current round
-let roundWords = [];       // words that make up the current round (for progress total)
-let missedThisRound = [];  // words answered wrong in this round
-let allTimeMissed = [];    // unique words missed across the whole session (for results display)
-let totalAnswered = 0;     // answers given in the current round
-let correctCount = 0;      // correct answers in the current round
-let isDrill = false;       // are we drilling mistakes?
-let answered = false;      // has the current question been answered?
-
-// ---- Helpers ----
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -488,38 +372,35 @@ function shuffle(arr) {
   }
   return a;
 }
-
-// What text identifies the "answer" side, used to dedupe options.
-function answerKey(word) {
-  return direction === "cn2en" ? word.en : word.cn;
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
+function answerKey(word) { return direction === "cn2en" ? word.en : word.cn; }
 
-// Build 4 options: the correct word + 3 distractors biased to same pos.
+/* ============================================================
+   TAB 1 — Multiple-choice vocabulary quiz
+   ============================================================ */
+let queue = [], roundWords = [], missedThisRound = [], totalAnswered = 0, correctCount = 0, isDrill = false, answered = false;
+
 function buildOptions(correct) {
   const correctKey = answerKey(correct);
-
-  // Candidate distractors: not the same answer text as correct.
   const pool = VOCAB.filter(w => answerKey(w) !== correctKey);
-
-  // Same part of speech first, then everyone else as fallback.
   const samePos = shuffle(pool.filter(w => w.pos === correct.pos));
   const otherPos = shuffle(pool.filter(w => w.pos !== correct.pos));
   const ordered = samePos.concat(otherPos);
-
   const distractors = [];
   const usedKeys = new Set([correctKey]);
   for (const w of ordered) {
     const k = answerKey(w);
-    if (usedKeys.has(k)) continue;   // avoid duplicate answer text
+    if (usedKeys.has(k)) continue;
     usedKeys.add(k);
     distractors.push(w);
     if (distractors.length === 3) break;
   }
-
   return shuffle([correct].concat(distractors));
 }
 
-// ---- Round lifecycle ----
 function startRound(words, drill) {
   isDrill = drill;
   roundWords = words.slice();
@@ -527,7 +408,8 @@ function startRound(words, drill) {
   missedThisRound = [];
   totalAnswered = 0;
   correctCount = 0;
-  showScreen("quiz");
+  document.getElementById("results-screen").style.display = "none";
+  document.getElementById("quiz-screen").style.display = "block";
   nextQuestion();
 }
 
@@ -536,24 +418,17 @@ function nextQuestion() {
   document.getElementById("feedback").textContent = "";
   document.getElementById("feedback").className = "feedback";
   document.getElementById("next-row").style.display = "none";
-
-  if (queue.length === 0) {
-    showResults();
-    return;
-  }
-
-  const word = queue[0];
-  renderPrompt(word);
-  renderOptions(word);
+  if (queue.length === 0) { showResults(); return; }
+  renderPrompt(queue[0]);
+  renderOptions(queue[0]);
   renderProgress();
 }
 
 function renderProgress() {
   const total = roundWords.length;
-  const done = totalAnswered;
-  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  const pct = total === 0 ? 0 : Math.round((totalAnswered / total) * 100);
   document.getElementById("progress-fill").style.width = pct + "%";
-  document.getElementById("progress-text").textContent = (done) + " / " + total;
+  document.getElementById("progress-text").textContent = totalAnswered + " / " + total;
   document.getElementById("mode-tag").textContent = isDrill ? "Drill" : "Quiz";
 }
 
@@ -579,13 +454,12 @@ function renderOptions(word) {
     const btn = document.createElement("button");
     btn.className = "opt";
     btn.type = "button";
-    // Tag the correct option so we can reveal it after a wrong answer.
     if (answerKey(opt) === answerKey(word)) btn.dataset.correct = "1";
     const num = '<span class="num">' + (i + 1) + '</span>';
     if (direction === "cn2en") {
       btn.innerHTML = num + '<span class="label-en">' + escapeHtml(opt.en) + '</span>';
     } else {
-      // English → Chinese: show characters only (no pinyin) so it tests recognition.
+      // English → Chinese: characters only (no pinyin) so it tests recognition.
       btn.innerHTML = num + '<span class="label-cn">' + escapeHtml(opt.cn) + '</span>';
     }
     btn.addEventListener("click", () => handleAnswer(btn, opt, word));
@@ -597,13 +471,10 @@ function handleAnswer(btn, chosen, correct) {
   if (answered) return;
   answered = true;
   totalAnswered++;
-
   const buttons = Array.from(document.getElementById("options").children);
   buttons.forEach(b => b.disabled = true);
-
   const isRight = answerKey(chosen) === answerKey(correct);
   const fb = document.getElementById("feedback");
-
   if (isRight) {
     btn.classList.add("correct");
     correctCount++;
@@ -611,74 +482,56 @@ function handleAnswer(btn, chosen, correct) {
     fb.className = "feedback ok";
   } else {
     btn.classList.add("wrong");
-    // reveal the correct option
-    buttons.forEach(b => {
-      if (b.dataset.correct === "1") b.classList.add("correct");
-    });
+    buttons.forEach(b => { if (b.dataset.correct === "1") b.classList.add("correct"); });
     fb.innerHTML = "Answer: <strong>" +
       (direction === "cn2en"
         ? escapeHtml(correct.en)
-        : escapeHtml(correct.cn) + " (" + escapeHtml(correct.py) + ")") +
+        : escapeHtml(correct.cn) + ' <span class="fb-py">(' + escapeHtml(correct.py) + ")</span>") +
       "</strong>";
     fb.className = "feedback no";
     recordMiss(correct);
   }
-
   document.getElementById("next-row").style.display = "block";
   renderProgress();
 }
 
-function recordMiss(word) {
-  missedThisRound.push(word);
-  if (!allTimeMissed.some(w => w.cn === word.cn && w.en === word.en)) {
-    allTimeMissed.push(word);
+function recordMiss(word) { missedThisRound.push(word); }
+
+function uniqueMissedThisRound() {
+  const seen = new Set(), out = [];
+  for (const w of missedThisRound) {
+    const k = w.cn + "|" + w.en;
+    if (!seen.has(k)) { seen.add(k); out.push(w); }
   }
+  return out;
 }
 
 function showResults() {
-  showScreen("results");
+  document.getElementById("quiz-screen").style.display = "none";
+  document.getElementById("results-screen").style.display = "block";
   const total = roundWords.length;
   const pct = total === 0 ? 100 : Math.round((correctCount / total) * 100);
-
   document.getElementById("score-big").textContent = pct + "%";
   document.getElementById("score-sub").textContent =
     correctCount + " of " + total + " correct" + (isDrill ? " (drill round)" : "");
-
   const actions = document.getElementById("results-actions");
   actions.innerHTML = "";
   const missedContainer = document.getElementById("missed-container");
   missedContainer.innerHTML = "";
-
   if (missedThisRound.length === 0) {
-    // Clean round!
     const msg = document.createElement("div");
     msg.className = "perfect";
     msg.innerHTML = isDrill
       ? '<span class="clean-badge">✓ Clean round — all drilled words mastered!</span>'
       : '<span class="clean-badge">✓ Perfect — no mistakes!</span>';
     missedContainer.appendChild(msg);
-
-    const restart = mkBtn("Restart all words", "primary", () => startRound(VOCAB, false));
-    actions.appendChild(restart);
+    actions.appendChild(mkBtn("Restart all words", "primary", () => startRound(VOCAB, false)));
   } else {
-    // Show missed words
-    const drillBtn = mkBtn("Drill these words (" + uniqueMissedThisRound().length + ")", "primary",
-      () => startRound(uniqueMissedThisRound(), true));
-    actions.appendChild(drillBtn);
+    const miss = uniqueMissedThisRound();
+    actions.appendChild(mkBtn("Drill these words (" + miss.length + ")", "primary", () => startRound(miss, true)));
     actions.appendChild(mkBtn("Restart all words", "", () => startRound(VOCAB, false)));
-
-    renderMissedList(missedContainer, uniqueMissedThisRound());
+    renderMissedList(missedContainer, miss);
   }
-}
-
-function uniqueMissedThisRound() {
-  const seen = new Set();
-  const out = [];
-  for (const w of missedThisRound) {
-    const k = w.cn + "|" + w.en;
-    if (!seen.has(k)) { seen.add(k); out.push(w); }
-  }
-  return out;
 }
 
 function renderMissedList(container, words) {
@@ -693,14 +546,13 @@ function renderMissedList(container, words) {
     row.className = "missed-row";
     row.innerHTML =
       '<div class="mc-cn">' + escapeHtml(w.cn) + '</div>' +
-      '<div class="mc-meta"><span class="py">' + escapeHtml(w.py) + '</span> — ' +
+      '<div class="mc-meta"><span class="py fb-py">' + escapeHtml(w.py) + '</span><span class="fb-py"> — </span>' +
       '<span class="en">' + escapeHtml(w.en) + '</span></div>';
     list.appendChild(row);
   });
   container.appendChild(list);
 }
 
-// ---- UI plumbing ----
 function mkBtn(label, cls, onClick) {
   const b = document.createElement("button");
   b.className = "btn" + (cls ? " " + cls : "");
@@ -709,31 +561,130 @@ function mkBtn(label, cls, onClick) {
   return b;
 }
 
-function showScreen(which) {
-  document.getElementById("quiz-screen").style.display = which === "quiz" ? "block" : "none";
-  document.getElementById("results-screen").style.display = which === "results" ? "block" : "none";
+/* ============================================================
+   TAB 2 — Flashcard self-test (Whole-Book Review)
+   ============================================================ */
+let fcDeck = [], fcNext = [], fcIndex = 0, fcMastered = 0, fcTotal = 0, fcRevealed = false;
+
+function fcStart() {
+  fcDeck = shuffle(VOCAB);
+  fcNext = [];
+  fcIndex = 0;
+  fcMastered = 0;
+  fcTotal = VOCAB.length;
+  document.getElementById("fc-done").style.display = "none";
+  document.getElementById("fc-screen").style.display = "block";
+  fcRender();
 }
 
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+function fcRender() {
+  fcRevealed = false;
+  document.getElementById("fc-grade").style.display = "none";
+  document.getElementById("fc-show").style.display = "block";
+
+  if (fcIndex >= fcDeck.length) {
+    if (fcNext.length > 0) { fcDeck = fcNext; fcNext = []; fcIndex = 0; }
+    else { fcFinish(); return; }
+  }
+  const w = fcDeck[fcIndex];
+  const card = document.getElementById("fc-card");
+  if (direction === "cn2en") {
+    card.innerHTML =
+      '<div class="fc-side-label">Chinese</div>' +
+      '<div class="fc-cn">' + escapeHtml(w.cn) + '</div>' +
+      '<div class="fc-py">' + escapeHtml(w.py) + '</div>';
+  } else {
+    card.innerHTML =
+      '<div class="fc-side-label">English</div>' +
+      '<div class="fc-en">' + escapeHtml(w.en) + '</div>' +
+      '<div class="fc-pos">' + escapeHtml(w.pos) + '</div>';
+  }
+  fcProgress();
 }
 
-function updateSubtitle() {
-  document.getElementById("subtitle").textContent = VOCAB.length + " words";
+function fcReveal() {
+  if (fcRevealed) return;
+  fcRevealed = true;
+  const w = fcDeck[fcIndex];
+  const card = document.getElementById("fc-card");
+  let back;
+  if (direction === "cn2en") {
+    back = '<div class="fc-side-label">English</div>' +
+           '<div class="fc-en">' + escapeHtml(w.en) + '</div>' +
+           '<div class="fc-pos">' + escapeHtml(w.pos) + '</div>';
+  } else {
+    back = '<div class="fc-side-label">Chinese</div>' +
+           '<div class="fc-cn">' + escapeHtml(w.cn) + '</div>' +
+           '<div class="fc-py">' + escapeHtml(w.py) + '</div>';
+  }
+  card.innerHTML += '<hr class="fc-divider">' + back;
+  document.getElementById("fc-show").style.display = "none";
+  document.getElementById("fc-grade").style.display = "flex";
 }
+
+function fcGrade(got) {
+  if (!fcRevealed) return;
+  if (got) fcMastered++;
+  else fcNext.push(fcDeck[fcIndex]);   // re-queue for another pass
+  fcIndex++;
+  fcRender();
+}
+
+function fcProgress() {
+  const pct = fcTotal === 0 ? 0 : Math.round((fcMastered / fcTotal) * 100);
+  document.getElementById("fc-fill").style.width = pct + "%";
+  document.getElementById("fc-progress").textContent = "Mastered " + fcMastered + " / " + fcTotal;
+}
+
+function fcFinish() {
+  document.getElementById("fc-screen").style.display = "none";
+  document.getElementById("fc-done").style.display = "block";
+}
+
+/* ============================================================
+   UI plumbing — tabs, pinyin, flip, share
+   ============================================================ */
+function showTab(name) {
+  currentTab = name;
+  const isVocab = name === "vocab";
+  document.getElementById("tab-vocab").style.display = isVocab ? "block" : "none";
+  document.getElementById("tab-book").style.display = isVocab ? "none" : "block";
+  document.getElementById("tab-btn-vocab").classList.toggle("active", isVocab);
+  document.getElementById("tab-btn-book").classList.toggle("active", !isVocab);
+}
+
+function updateSubtitle() { document.getElementById("subtitle").textContent = VOCAB.length + " words · Chinese Book 1 (A1)"; }
 
 function updateFlipLabel() {
-  // Show the CURRENT quiz direction right on the button so it's obvious.
   const b = document.getElementById("btn-flip");
-  b.innerHTML = (direction === "cn2en"
-    ? "中文 &rarr; English"
-    : "English &rarr; 中文") + ' <span class="swap">⇄</span>';
+  b.innerHTML = (direction === "cn2en" ? "中文 &rarr; English" : "English &rarr; 中文") + ' <span class="swap">⇄</span>';
 }
 
-// ---- Toolbar wiring ----
-const QUIZ_URL = "https://ansaaj1990.github.io/chinese-book1-quiz/";
+function updatePinyinLabel() {
+  const b = document.getElementById("btn-pinyin");
+  b.textContent = showPinyin ? "Pinyin: On" : "Pinyin: Off";
+  b.classList.toggle("off", !showPinyin);
+  document.body.classList.toggle("hide-pinyin", !showPinyin);
+}
+
+// Tabs
+document.getElementById("tab-btn-vocab").addEventListener("click", () => showTab("vocab"));
+document.getElementById("tab-btn-book").addEventListener("click", () => showTab("book"));
+
+// Direction (shared) — restart the active tab so prompts switch
+document.getElementById("btn-flip").addEventListener("click", () => {
+  direction = direction === "cn2en" ? "en2cn" : "cn2en";
+  updateFlipLabel();
+  if (currentTab === "vocab") startRound(VOCAB, false); else fcStart();
+});
+
+// Pinyin show/hide (global, instant via body class — no reset)
+document.getElementById("btn-pinyin").addEventListener("click", () => {
+  showPinyin = !showPinyin;
+  updatePinyinLabel();
+});
+
+// Share / QR
 document.getElementById("btn-share").addEventListener("click", () => {
   const p = document.getElementById("share-panel");
   p.style.display = p.style.display === "none" ? "block" : "none";
@@ -741,54 +692,54 @@ document.getElementById("btn-share").addEventListener("click", () => {
 document.getElementById("btn-copy").addEventListener("click", async () => {
   const btn = document.getElementById("btn-copy");
   let ok = false;
-  try {
-    await navigator.clipboard.writeText(QUIZ_URL);
-    ok = true;
-  } catch (e) {
-    // Fallback for non-secure contexts (e.g. opened via file://)
+  try { await navigator.clipboard.writeText(QUIZ_URL); ok = true; }
+  catch (e) {
     const ta = document.createElement("textarea");
-    ta.value = QUIZ_URL;
-    ta.style.position = "fixed";
-    ta.style.opacity = "0";
-    document.body.appendChild(ta);
-    ta.select();
+    ta.value = QUIZ_URL; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
     try { ok = document.execCommand("copy"); } catch (_) { ok = false; }
     document.body.removeChild(ta);
   }
   btn.textContent = ok ? "Copied!" : "Copy failed — long-press the link";
   setTimeout(() => { btn.textContent = "Copy link"; }, 1800);
 });
-document.getElementById("btn-flip").addEventListener("click", () => {
-  direction = direction === "cn2en" ? "en2cn" : "cn2en";
-  updateSubtitle();
-  updateFlipLabel();
-  startRound(VOCAB, false);
-});
-document.getElementById("btn-restart").addEventListener("click", () => {
-  allTimeMissed = [];
-  startRound(VOCAB, false);
-});
-document.getElementById("btn-next").addEventListener("click", () => {
-  queue.shift();      // drop the answered word
-  nextQuestion();
-});
 
-// Keyboard: 1-4 to answer, Enter / → for next
+// Quiz controls
+document.getElementById("btn-restart").addEventListener("click", () => startRound(VOCAB, false));
+document.getElementById("btn-next").addEventListener("click", () => { queue.shift(); nextQuestion(); });
+
+// Flashcard controls
+document.getElementById("fc-show").addEventListener("click", fcReveal);
+document.getElementById("fc-got").addEventListener("click", () => fcGrade(true));
+document.getElementById("fc-again").addEventListener("click", () => fcGrade(false));
+document.getElementById("fc-restart").addEventListener("click", fcStart);
+document.getElementById("fc-again-all").addEventListener("click", fcStart);
+
+// Keyboard
 document.addEventListener("keydown", (e) => {
-  if (document.getElementById("quiz-screen").style.display === "none") return;
-  if (!answered && ["1","2","3","4"].includes(e.key)) {
-    const idx = parseInt(e.key, 10) - 1;
-    const buttons = document.getElementById("options").children;
-    if (buttons[idx]) buttons[idx].click();
-  } else if (answered && (e.key === "Enter" || e.key === "ArrowRight")) {
-    document.getElementById("btn-next").click();
+  if (currentTab === "vocab") {
+    if (document.getElementById("quiz-screen").style.display === "none") return;
+    if (!answered && ["1","2","3","4"].includes(e.key)) {
+      const b = document.getElementById("options").children[parseInt(e.key,10)-1];
+      if (b) b.click();
+    } else if (answered && (e.key === "Enter" || e.key === "ArrowRight")) {
+      document.getElementById("btn-next").click();
+    }
+  } else {
+    if (document.getElementById("fc-screen").style.display === "none") return;
+    if (!fcRevealed && (e.key === " " || e.key === "Enter")) { e.preventDefault(); fcReveal(); }
+    else if (fcRevealed && (e.key === "1" || e.key.toLowerCase() === "a")) fcGrade(false);
+    else if (fcRevealed && (e.key === "2" || e.key.toLowerCase() === "g" || e.key === "Enter")) fcGrade(true);
   }
 });
 
 // ---- Boot ----
 updateSubtitle();
 updateFlipLabel();
+updatePinyinLabel();
+showTab("vocab");
 startRound(VOCAB, false);
+fcStart();
 </script>
 </body>
 </html>
