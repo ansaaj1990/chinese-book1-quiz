@@ -59,24 +59,34 @@
   .wrap {
     max-width: 680px;
     margin: 0 auto;
-    padding: 18px 16px 60px;
+    padding: 10px 14px 14px;
   }
 
   /* ---------- Header / toolbar ---------- */
-  header { text-align: center; margin: 8px 0 18px; }
-  header h1 { font-size: 1.25rem; margin: 0 0 4px; font-weight: 700; }
-  header .sub { color: var(--muted); font-size: 0.85rem; }
+  header { text-align: center; margin: 2px 0 8px; }
+  header h1 { font-size: 1.05rem; margin: 0 0 2px; font-weight: 700; }
+  header .sub { color: var(--muted); font-size: 0.78rem; }
 
   .toolbar {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
   .toolbar button {
     flex: 0 0 auto;
   }
+  /* Flip button: make the quiz direction obvious and prominent */
+  #btn-flip {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-text);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  #btn-flip:hover { filter: brightness(1.06); background: var(--accent); }
+  #btn-flip .swap { opacity: 0.85; font-weight: 400; }
 
   /* ---------- Share / QR panel ---------- */
   #share-panel { margin: 0 0 18px; }
@@ -113,9 +123,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
     font-size: 0.85rem;
     color: var(--muted);
+    position: sticky;          /* stays visible — no scrolling up to see progress */
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    padding: 8px 0;
   }
   .progress-track {
     flex: 1;
@@ -141,29 +156,29 @@
   .card {
     background: var(--card);
     border: 1px solid var(--card-border);
-    border-radius: 18px;
+    border-radius: 16px;
     box-shadow: var(--shadow);
-    padding: 28px 22px;
+    padding: 16px 16px;
     text-align: center;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
   }
   .prompt-cn {
-    font-size: 4.6rem;
-    line-height: 1.15;
+    font-size: 3.4rem;
+    line-height: 1.1;
     font-weight: 600;
     letter-spacing: 0.02em;
-    margin: 4px 0 8px;
+    margin: 2px 0 4px;
     word-break: break-word;
   }
   .prompt-py {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: var(--muted);
     margin-bottom: 2px;
   }
   .prompt-en {
-    font-size: 2.4rem;
+    font-size: 2rem;
     font-weight: 600;
-    margin: 8px 0;
+    margin: 4px 0;
     word-break: break-word;
   }
   .prompt-pos {
@@ -179,15 +194,15 @@
   }
 
   /* ---------- Options ---------- */
-  .options { display: grid; gap: 10px; }
+  .options { display: grid; gap: 8px; }
   .opt {
     width: 100%;
     text-align: left;
     background: var(--opt-bg);
     border: 1.5px solid var(--opt-border);
     color: var(--text);
-    border-radius: 14px;
-    padding: 16px 18px;
+    border-radius: 12px;
+    padding: 11px 14px;
     cursor: pointer;
     transition: background 0.12s ease, border-color 0.12s ease, transform 0.05s ease;
     display: flex;
@@ -206,9 +221,9 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 0.85rem; font-weight: 700;
   }
-  .opt .label-en { font-size: 1.25rem; font-weight: 500; }
-  .opt .label-cn { font-size: 2.1rem; font-weight: 600; line-height: 1.1; }
-  .opt .label-cn small { display: block; font-size: 1rem; font-weight: 400; color: var(--muted); margin-top: 2px; }
+  .opt .label-en { font-size: 1.15rem; font-weight: 500; }
+  .opt .label-cn { font-size: 1.85rem; font-weight: 600; line-height: 1.1; }
+  .opt .label-cn small { display: block; font-size: 0.95rem; font-weight: 400; color: var(--muted); margin-top: 1px; }
   .opt.correct { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-text); }
   .opt.correct .num { background: var(--correct-border); color: #fff; }
   .opt.wrong { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-text); }
@@ -235,12 +250,21 @@
   }
   button.btn.primary:hover { filter: brightness(1.06); background: var(--accent); }
 
-  .next-row { margin-top: 16px; text-align: center; }
+  .next-row {
+    margin-top: 8px;
+    text-align: center;
+    position: sticky;          /* stays reachable — no scrolling down to hit Next */
+    bottom: 0;
+    z-index: 5;
+    background: var(--bg);
+    padding: 8px 0 4px;
+  }
+  #btn-next { width: 100%; max-width: 340px; padding: 13px 16px; font-size: 1.05rem; }
   .feedback {
     text-align: center;
     font-weight: 600;
-    min-height: 1.4em;
-    margin-top: 14px;
+    min-height: 1.3em;
+    margin-top: 8px;
   }
   .feedback.ok { color: var(--correct-text); }
   .feedback.no { color: var(--wrong-text); }
@@ -282,8 +306,20 @@
     font-weight: 700;
     margin-top: 14px;
   }
-  .hint { color: var(--muted); font-size: 0.8rem; margin-top: 22px; text-align:center; }
+  .hint { color: var(--muted); font-size: 0.72rem; margin-top: 14px; text-align:center; }
   .clean-badge { color: var(--correct-text); font-weight:700; }
+
+  /* On short screens, shrink further so the whole question fits without scrolling */
+  @media (max-height: 720px) {
+    .prompt-cn { font-size: 2.7rem; }
+    .prompt-en { font-size: 1.7rem; }
+    .prompt-py { font-size: 1.1rem; }
+    .card { padding: 12px 14px; margin-bottom: 10px; }
+    .opt { padding: 9px 12px; }
+    .opt .label-cn { font-size: 1.6rem; }
+    .opt .label-en { font-size: 1.05rem; }
+    .hint { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -294,7 +330,7 @@
   </header>
 
   <div class="toolbar">
-    <button class="btn" id="btn-flip">Flip direction</button>
+    <button class="btn" id="btn-flip" title="Tap to switch quiz direction"></button>
     <button class="btn" id="btn-restart">Restart all words</button>
     <button class="btn" id="btn-share">Share / QR</button>
   </div>
@@ -685,9 +721,15 @@ function escapeHtml(s) {
 }
 
 function updateSubtitle() {
-  document.getElementById("subtitle").textContent =
-    VOCAB.length + " words · " +
-    (direction === "cn2en" ? "Chinese → English" : "English → Chinese");
+  document.getElementById("subtitle").textContent = VOCAB.length + " words";
+}
+
+function updateFlipLabel() {
+  // Show the CURRENT quiz direction right on the button so it's obvious.
+  const b = document.getElementById("btn-flip");
+  b.innerHTML = (direction === "cn2en"
+    ? "中文 &rarr; English"
+    : "English &rarr; 中文") + ' <span class="swap">⇄</span>';
 }
 
 // ---- Toolbar wiring ----
@@ -719,6 +761,7 @@ document.getElementById("btn-copy").addEventListener("click", async () => {
 document.getElementById("btn-flip").addEventListener("click", () => {
   direction = direction === "cn2en" ? "en2cn" : "cn2en";
   updateSubtitle();
+  updateFlipLabel();
   startRound(VOCAB, false);
 });
 document.getElementById("btn-restart").addEventListener("click", () => {
@@ -744,6 +787,7 @@ document.addEventListener("keydown", (e) => {
 
 // ---- Boot ----
 updateSubtitle();
+updateFlipLabel();
 startRound(VOCAB, false);
 </script>
 </body>
