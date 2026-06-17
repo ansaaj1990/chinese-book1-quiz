@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chinese Book 1 — Vocab Quiz</title>
+<style>
+  /* ---------- Theme tokens (light default, dark via prefers-color-scheme) ---------- */
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --card-border: #e2e5ea;
+    --text: #1b1d22;
+    --muted: #6b7280;
+    --accent: #5a9ba3;
+    --accent-text: #ffffff;
+    --opt-bg: #ffffff;
+    --opt-border: #d4d8df;
+    --opt-hover: #eef6f7;
+    --correct-bg: #e6f6ea;
+    --correct-border: #3ca35a;
+    --correct-text: #1d6b34;
+    --wrong-bg: #fdeaea;
+    --wrong-border: #d9534f;
+    --wrong-text: #a3302c;
+    --shadow: 0 6px 24px rgba(0,0,0,0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --card: #1e2127;
+      --card-border: #2c3038;
+      --text: #f0f2f5;
+      --muted: #9aa1ad;
+      --accent: #5fb0ba;
+      --accent-text: #0c1112;
+      --opt-bg: #23272e;
+      --opt-border: #353a43;
+      --opt-hover: #2b313a;
+      --correct-bg: #14331f;
+      --correct-border: #3ca35a;
+      --correct-text: #7ee29a;
+      --wrong-bg: #361a1a;
+      --wrong-border: #d9534f;
+      --wrong-text: #f0a3a0;
+      --shadow: 0 6px 24px rgba(0,0,0,0.4);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 18px 16px 60px;
+  }
+
+  /* ---------- Header / toolbar ---------- */
+  header { text-align: center; margin: 8px 0 18px; }
+  header h1 { font-size: 1.25rem; margin: 0 0 4px; font-weight: 700; }
+  header .sub { color: var(--muted); font-size: 0.85rem; }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .toolbar button {
+    flex: 0 0 auto;
+  }
+
+  /* ---------- Progress bar ---------- */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .progress-track {
+    flex: 1;
+    height: 8px;
+    background: var(--card-border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.25s ease;
+  }
+  .mode-tag {
+    font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* ---------- Prompt card ---------- */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 28px 22px;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .prompt-cn {
+    font-size: 4.6rem;
+    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 4px 0 8px;
+    word-break: break-word;
+  }
+  .prompt-py {
+    font-size: 1.5rem;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+  .prompt-en {
+    font-size: 2.4rem;
+    font-weight: 600;
+    margin: 8px 0;
+    word-break: break-word;
+  }
+  .prompt-pos {
+    display: inline-block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    border: 1px solid var(--card-border);
+    border-radius: 99px;
+    padding: 2px 10px;
+    margin-top: 6px;
+  }
+
+  /* ---------- Options ---------- */
+  .options { display: grid; gap: 10px; }
+  .opt {
+    width: 100%;
+    text-align: left;
+    background: var(--opt-bg);
+    border: 1.5px solid var(--opt-border);
+    color: var(--text);
+    border-radius: 14px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.05s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .opt:hover:not(:disabled) { background: var(--opt-hover); }
+  .opt:active:not(:disabled) { transform: scale(0.99); }
+  .opt:disabled { cursor: default; }
+  .opt .num {
+    flex: 0 0 auto;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--card-border);
+    color: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700;
+  }
+  .opt .label-en { font-size: 1.25rem; font-weight: 500; }
+  .opt .label-cn { font-size: 2.1rem; font-weight: 600; line-height: 1.1; }
+  .opt .label-cn small { display: block; font-size: 1rem; font-weight: 400; color: var(--muted); margin-top: 2px; }
+  .opt.correct { background: var(--correct-bg); border-color: var(--correct-border); color: var(--correct-text); }
+  .opt.correct .num { background: var(--correct-border); color: #fff; }
+  .opt.wrong { background: var(--wrong-bg); border-color: var(--wrong-border); color: var(--wrong-text); }
+  .opt.wrong .num { background: var(--wrong-border); color: #fff; }
+
+  /* ---------- Generic buttons ---------- */
+  button.btn {
+    font: inherit;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 10px 16px;
+    border: 1.5px solid var(--opt-border);
+    background: var(--opt-bg);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.12s ease, transform 0.05s ease;
+  }
+  button.btn:hover { background: var(--opt-hover); }
+  button.btn:active { transform: scale(0.98); }
+  button.btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+  button.btn.primary:hover { filter: brightness(1.06); background: var(--accent); }
+
+  .next-row { margin-top: 16px; text-align: center; }
+  .feedback {
+    text-align: center;
+    font-weight: 600;
+    min-height: 1.4em;
+    margin-top: 14px;
+  }
+  .feedback.ok { color: var(--correct-text); }
+  .feedback.no { color: var(--wrong-text); }
+
+  /* ---------- Results ---------- */
+  .results { text-align: center; }
+  .score-big { font-size: 3.4rem; font-weight: 800; margin: 6px 0; }
+  .score-sub { color: var(--muted); margin-bottom: 8px; }
+  .results-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0 8px; }
+
+  .missed-list {
+    text-align: left;
+    margin: 18px auto 0;
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .missed-list .head {
+    background: var(--opt-hover);
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .missed-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 14px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--card-border);
+    align-items: baseline;
+  }
+  .missed-row .mc-cn { font-size: 2rem; font-weight: 600; line-height: 1.15; }
+  .missed-row .mc-meta { color: var(--muted); }
+  .missed-row .mc-meta .py { color: var(--accent); font-weight: 600; }
+  .missed-row .mc-meta .en { color: var(--text); }
+  .perfect {
+    font-size: 1.1rem;
+    color: var(--correct-text);
+    font-weight: 700;
+    margin-top: 14px;
+  }
+  .hint { color: var(--muted); font-size: 0.8rem; margin-top: 22px; text-align:center; }
+  .clean-badge { color: var(--correct-text); font-weight:700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Chinese Book 1 — Vocab Quiz</h1>
+    <div class="sub" id="subtitle"></div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn" id="btn-flip">Flip direction</button>
+    <button class="btn" id="btn-restart">Restart all words</button>
+  </div>
+
+  <!-- Quiz screen -->
+  <div id="quiz-screen">
+    <div class="progress-row">
+      <span class="mode-tag" id="mode-tag"></span>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <span id="progress-text"></span>
+    </div>
+
+    <div class="card" id="prompt-card"></div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="next-row" id="next-row" style="display:none;">
+      <button class="btn primary" id="btn-next">Next →</button>
+    </div>
+  </div>
+
+  <!-- Results screen -->
+  <div id="results-screen" style="display:none;">
+    <div class="results">
+      <div class="score-big" id="score-big"></div>
+      <div class="score-sub" id="score-sub"></div>
+      <div class="results-actions" id="results-actions"></div>
+      <div id="missed-container"></div>
+    </div>
+  </div>
+
+  <div class="hint">All vocab lives in the <code>VOCAB</code> array at the top of the &lt;script&gt; — edit it in one place. Works offline; just double-click.</div>
+</div>
+
+<script>
+/* ============================================================
+   WORD LIST  —  edit here.  One object per word.
+   cn = Chinese characters, py = pinyin, en = English,
+   pos = part of speech (used to pick believable wrong answers).
+   ============================================================ */
+const VOCAB = [
+  { cn: "你好",         py: "nǐ hǎo",                  en: "hello",             pos: "Greeting" },
+  { cn: "你",           py: "nǐ",                      en: "you",               pos: "Pronoun" },
+  { cn: "我",           py: "wǒ",                      en: "I / me",            pos: "Pronoun" },
+  { cn: "他",           py: "tā",                      en: "he / him",          pos: "Pronoun" },
+  { cn: "她",           py: "tā",                      en: "she / her",         pos: "Pronoun" },
+  { cn: "我们",         py: "wǒ men",                  en: "we / us",           pos: "Pronoun" },
+  { cn: "你们",         py: "nǐ men",                  en: "you (plural)",      pos: "Pronoun" },
+  { cn: "好",           py: "hǎo",                     en: "good",              pos: "Adjective" },
+  { cn: "很",           py: "hěn",                     en: "very",              pos: "Adverb" },
+  { cn: "漂亮",         py: "piào liang",              en: "beautiful",         pos: "Adjective" },
+  { cn: "中国",         py: "zhōng guó",               en: "China",             pos: "Noun" },
+  { cn: "美国",         py: "měi guó",                 en: "USA",               pos: "Noun" },
+  { cn: "沙特",         py: "shā tè",                  en: "Saudi Arabia",      pos: "Noun" },
+  { cn: "人",           py: "rén",                     en: "person / people",   pos: "Noun" },
+  { cn: "哪",           py: "nǎ",                      en: "which",             pos: "Interrogative Pronoun" },
+  { cn: "哪儿",         py: "nǎ er",                   en: "where",             pos: "Interrogative Pronoun" },
+  { cn: "哪国",         py: "nǎ guó",                  en: "which country",     pos: "Interrogative Pronoun" },
+  { cn: "这",           py: "zhè",                     en: "this",              pos: "Demonstrative Pronoun" },
+  { cn: "两",           py: "liǎng",                   en: "two",               pos: "Numeral" },
+  { cn: "两个人",       py: "liǎng gè rén",            en: "two people",        pos: "Quantifier Phrase" },
+  { cn: "有",           py: "yǒu",                     en: "to have",           pos: "Verb" },
+  { cn: "没有",         py: "méi yǒu",                 en: "not have",          pos: "Verb / Negative Structure" },
+  { cn: "是",           py: "shì",                     en: "to be",             pos: "Verb" },
+  { cn: "我是……",       py: "wǒ shì...",               en: "I am...",           pos: "Sentence Pattern" },
+  { cn: "我叫……",       py: "wǒ jiào...",              en: "my name is...",     pos: "Sentence Pattern" },
+  { cn: "很高兴认识你", py: "hěn gāo xìng rèn shi nǐ", en: "nice to meet you",  pos: "Sentence Pattern" },
+  { cn: "手机",         py: "shǒu jī",                 en: "mobile phone",      pos: "Noun" },
+  { cn: "电脑",         py: "diàn nǎo",                en: "computer",          pos: "Noun" },
+  { cn: "手",           py: "shǒu",                    en: "hand",              pos: "Noun" },
+  { cn: "微信",         py: "wēi xìn",                 en: "WeChat",            pos: "Noun" },
+  { cn: "支付宝",       py: "zhī fù bǎo",              en: "Alipay",            pos: "Noun" },
+  { cn: "玩",           py: "wán",                     en: "to play",           pos: "Verb" },
+  { cn: "买",           py: "mǎi",                     en: "to buy",            pos: "Verb" },
+  { cn: "去",           py: "qù",                      en: "to go",             pos: "Verb" },
+  { cn: "想",           py: "xiǎng",                   en: "want to",           pos: "Modal Verb / Verb" },
+  { cn: "想去",         py: "xiǎng qù",                en: "want to go",        pos: "Verb Phrase" },
+  { cn: "请",           py: "qǐng",                    en: "invite / treat",    pos: "Verb" },
+  { cn: "加",           py: "jiā",                     en: "add",               pos: "Verb" },
+  { cn: "方便",         py: "fāng biàn",               en: "convenient",        pos: "Adjective" },
+  { cn: "太",           py: "tài",                     en: "too / very",        pos: "Adverb" },
+  { cn: "今天",         py: "jīn tiān",                en: "today",             pos: "Time Noun" },
+  { cn: "天",           py: "tiān",                    en: "day / sky",         pos: "Noun" },
+  { cn: "爸爸",         py: "bà ba",                   en: "father",            pos: "Noun" },
+  { cn: "妈妈",         py: "mā ma",                   en: "mother",            pos: "Noun" },
+  { cn: "男朋友",       py: "nán péng you",            en: "boyfriend",         pos: "Noun" },
+  { cn: "女朋友",       py: "nǚ péng you",             en: "girlfriend",        pos: "Noun" },
+  { cn: "公司",         py: "gōng sī",                 en: "company",           pos: "Noun" },
+  { cn: "店",           py: "diàn",                    en: "shop",              pos: "Noun" },
+  { cn: "商场",         py: "shāng chǎng",             en: "shopping mall",     pos: "Noun" },
+  { cn: "家",           py: "jiā",                     en: "home / family",     pos: "Noun" },
+  { cn: "超市",         py: "chāo shì",                en: "supermarket",       pos: "Noun" },
+  { cn: "前面",         py: "qián miàn",               en: "in front",          pos: "Localizer" },
+  { cn: "后面",         py: "hòu miàn",                en: "behind",            pos: "Localizer" },
+  { cn: "在",           py: "zài",                     en: "at / in / on",      pos: "Preposition / Verb" },
+  { cn: "谢谢",         py: "xiè xie",                 en: "thank you",         pos: "Polite Expression" },
+  { cn: "不客气",       py: "bú kè qi",                en: "you're welcome",    pos: "Polite Expression" },
+  { cn: "什么",         py: "shén me",                 en: "what",              pos: "Interrogative Pronoun" },
+  { cn: "吃",           py: "chī",                     en: "to eat",            pos: "Verb" },
+  { cn: "喝",           py: "hē",                      en: "to drink",          pos: "Verb" },
+  { cn: "喜欢",         py: "xǐ huān",                 en: "to like",           pos: "Verb" },
+  { cn: "和",           py: "hé",                      en: "and",               pos: "Conjunction" },
+  { cn: "也",           py: "yě",                      en: "also",              pos: "Adverb" },
+  { cn: "米饭",         py: "mǐ fàn",                  en: "rice",              pos: "Noun" },
+  { cn: "卡布萨",       py: "kǎ bù sà",                en: "Kabsa",             pos: "Noun" },
+  { cn: "炸鸡",         py: "zhà jī",                  en: "fried chicken",     pos: "Noun" },
+  { cn: "烤鱼",         py: "kǎo yú",                  en: "grilled fish",      pos: "Noun" },
+  { cn: "菜",           py: "cài",                     en: "dish / vegetables", pos: "Noun" },
+  { cn: "火锅",         py: "huǒ guō",                 en: "hot pot",           pos: "Noun" },
+  { cn: "面包",         py: "miàn bāo",                en: "bread",             pos: "Noun" },
+  { cn: "茶",           py: "chá",                     en: "tea",               pos: "Noun" },
+  { cn: "红茶",         py: "hóng chá",                en: "black tea",         pos: "Noun" },
+  { cn: "牛奶",         py: "niú nǎi",                 en: "milk",              pos: "Noun" },
+  { cn: "咖啡",         py: "kā fēi",                  en: "coffee",            pos: "Noun" },
+  { cn: "可乐",         py: "kě lè",                   en: "cola",              pos: "Noun" },
+  { cn: "水",           py: "shuǐ",                    en: "water",             pos: "Noun" },
+  { cn: "热水",         py: "rè shuǐ",                 en: "hot water",         pos: "Noun" },
+  { cn: "早",           py: "zǎo",                     en: "early / morning",   pos: "Adjective / Noun" },
+  { cn: "早上好",       py: "zǎo shang hǎo",           en: "good morning",      pos: "Greeting" },
+  { cn: "下午好",       py: "xià wǔ hǎo",              en: "good afternoon",    pos: "Greeting" },
+  { cn: "晚上好",       py: "wǎn shang hǎo",           en: "good evening",      pos: "Greeting" },
+  { cn: "不",           py: "bù",                      en: "not",               pos: "Adverb" }
+];
+
+/* ============================================================
+   Quiz engine
+   ============================================================ */
+
+// ---- State ----
+let direction = "cn2en";   // "cn2en" or "en2cn"
+let queue = [];            // words remaining in the current round
+let roundWords = [];       // words that make up the current round (for progress total)
+let missedThisRound = [];  // words answered wrong in this round
+let allTimeMissed = [];    // unique words missed across the whole session (for results display)
+let totalAnswered = 0;     // answers given in the current round
+let correctCount = 0;      // correct answers in the current round
+let isDrill = false;       // are we drilling mistakes?
+let answered = false;      // has the current question been answered?
+
+// ---- Helpers ----
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// What text identifies the "answer" side, used to dedupe options.
+function answerKey(word) {
+  return direction === "cn2en" ? word.en : word.cn;
+}
+
+// Build 4 options: the correct word + 3 distractors biased to same pos.
+function buildOptions(correct) {
+  const correctKey = answerKey(correct);
+
+  // Candidate distractors: not the same answer text as correct.
+  const pool = VOCAB.filter(w => answerKey(w) !== correctKey);
+
+  // Same part of speech first, then everyone else as fallback.
+  const samePos = shuffle(pool.filter(w => w.pos === correct.pos));
+  const otherPos = shuffle(pool.filter(w => w.pos !== correct.pos));
+  const ordered = samePos.concat(otherPos);
+
+  const distractors = [];
+  const usedKeys = new Set([correctKey]);
+  for (const w of ordered) {
+    const k = answerKey(w);
+    if (usedKeys.has(k)) continue;   // avoid duplicate answer text
+    usedKeys.add(k);
+    distractors.push(w);
+    if (distractors.length === 3) break;
+  }
+
+  return shuffle([correct].concat(distractors));
+}
+
+// ---- Round lifecycle ----
+function startRound(words, drill) {
+  isDrill = drill;
+  roundWords = words.slice();
+  queue = shuffle(words);
+  missedThisRound = [];
+  totalAnswered = 0;
+  correctCount = 0;
+  showScreen("quiz");
+  nextQuestion();
+}
+
+function nextQuestion() {
+  answered = false;
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("feedback").className = "feedback";
+  document.getElementById("next-row").style.display = "none";
+
+  if (queue.length === 0) {
+    showResults();
+    return;
+  }
+
+  const word = queue[0];
+  renderPrompt(word);
+  renderOptions(word);
+  renderProgress();
+}
+
+function renderProgress() {
+  const total = roundWords.length;
+  const done = totalAnswered;
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("progress-text").textContent = (done) + " / " + total;
+  document.getElementById("mode-tag").textContent = isDrill ? "Drill" : "Quiz";
+}
+
+function renderPrompt(word) {
+  const card = document.getElementById("prompt-card");
+  if (direction === "cn2en") {
+    card.innerHTML =
+      '<div class="prompt-cn">' + escapeHtml(word.cn) + '</div>' +
+      '<div class="prompt-py">' + escapeHtml(word.py) + '</div>' +
+      '<div class="prompt-pos">' + escapeHtml(word.pos) + '</div>';
+  } else {
+    card.innerHTML =
+      '<div class="prompt-en">' + escapeHtml(word.en) + '</div>' +
+      '<div class="prompt-pos">' + escapeHtml(word.pos) + '</div>';
+  }
+}
+
+function renderOptions(word) {
+  const opts = buildOptions(word);
+  const box = document.getElementById("options");
+  box.innerHTML = "";
+  opts.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "opt";
+    btn.type = "button";
+    // Tag the correct option so we can reveal it after a wrong answer.
+    if (answerKey(opt) === answerKey(word)) btn.dataset.correct = "1";
+    const num = '<span class="num">' + (i + 1) + '</span>';
+    if (direction === "cn2en") {
+      btn.innerHTML = num + '<span class="label-en">' + escapeHtml(opt.en) + '</span>';
+    } else {
+      btn.innerHTML = num + '<span class="label-cn">' + escapeHtml(opt.cn) +
+        '<small>' + escapeHtml(opt.py) + '</small></span>';
+    }
+    btn.addEventListener("click", () => handleAnswer(btn, opt, word));
+    box.appendChild(btn);
+  });
+}
+
+function handleAnswer(btn, chosen, correct) {
+  if (answered) return;
+  answered = true;
+  totalAnswered++;
+
+  const buttons = Array.from(document.getElementById("options").children);
+  buttons.forEach(b => b.disabled = true);
+
+  const isRight = answerKey(chosen) === answerKey(correct);
+  const fb = document.getElementById("feedback");
+
+  if (isRight) {
+    btn.classList.add("correct");
+    correctCount++;
+    fb.textContent = "Correct";
+    fb.className = "feedback ok";
+  } else {
+    btn.classList.add("wrong");
+    // reveal the correct option
+    buttons.forEach(b => {
+      if (b.dataset.correct === "1") b.classList.add("correct");
+    });
+    fb.innerHTML = "Answer: <strong>" +
+      (direction === "cn2en"
+        ? escapeHtml(correct.en)
+        : escapeHtml(correct.cn) + " (" + escapeHtml(correct.py) + ")") +
+      "</strong>";
+    fb.className = "feedback no";
+    recordMiss(correct);
+  }
+
+  document.getElementById("next-row").style.display = "block";
+  renderProgress();
+}
+
+function recordMiss(word) {
+  missedThisRound.push(word);
+  if (!allTimeMissed.some(w => w.cn === word.cn && w.en === word.en)) {
+    allTimeMissed.push(word);
+  }
+}
+
+function showResults() {
+  showScreen("results");
+  const total = roundWords.length;
+  const pct = total === 0 ? 100 : Math.round((correctCount / total) * 100);
+
+  document.getElementById("score-big").textContent = pct + "%";
+  document.getElementById("score-sub").textContent =
+    correctCount + " of " + total + " correct" + (isDrill ? " (drill round)" : "");
+
+  const actions = document.getElementById("results-actions");
+  actions.innerHTML = "";
+  const missedContainer = document.getElementById("missed-container");
+  missedContainer.innerHTML = "";
+
+  if (missedThisRound.length === 0) {
+    // Clean round!
+    const msg = document.createElement("div");
+    msg.className = "perfect";
+    msg.innerHTML = isDrill
+      ? '<span class="clean-badge">✓ Clean round — all drilled words mastered!</span>'
+      : '<span class="clean-badge">✓ Perfect — no mistakes!</span>';
+    missedContainer.appendChild(msg);
+
+    const restart = mkBtn("Restart all words", "primary", () => startRound(VOCAB, false));
+    actions.appendChild(restart);
+  } else {
+    // Show missed words
+    const drillBtn = mkBtn("Drill these words (" + uniqueMissedThisRound().length + ")", "primary",
+      () => startRound(uniqueMissedThisRound(), true));
+    actions.appendChild(drillBtn);
+    actions.appendChild(mkBtn("Restart all words", "", () => startRound(VOCAB, false)));
+
+    renderMissedList(missedContainer, uniqueMissedThisRound());
+  }
+}
+
+function uniqueMissedThisRound() {
+  const seen = new Set();
+  const out = [];
+  for (const w of missedThisRound) {
+    const k = w.cn + "|" + w.en;
+    if (!seen.has(k)) { seen.add(k); out.push(w); }
+  }
+  return out;
+}
+
+function renderMissedList(container, words) {
+  const list = document.createElement("div");
+  list.className = "missed-list";
+  const head = document.createElement("div");
+  head.className = "head";
+  head.textContent = "Missed this round (" + words.length + ")";
+  list.appendChild(head);
+  words.forEach(w => {
+    const row = document.createElement("div");
+    row.className = "missed-row";
+    row.innerHTML =
+      '<div class="mc-cn">' + escapeHtml(w.cn) + '</div>' +
+      '<div class="mc-meta"><span class="py">' + escapeHtml(w.py) + '</span> — ' +
+      '<span class="en">' + escapeHtml(w.en) + '</span></div>';
+    list.appendChild(row);
+  });
+  container.appendChild(list);
+}
+
+// ---- UI plumbing ----
+function mkBtn(label, cls, onClick) {
+  const b = document.createElement("button");
+  b.className = "btn" + (cls ? " " + cls : "");
+  b.textContent = label;
+  b.addEventListener("click", onClick);
+  return b;
+}
+
+function showScreen(which) {
+  document.getElementById("quiz-screen").style.display = which === "quiz" ? "block" : "none";
+  document.getElementById("results-screen").style.display = which === "results" ? "block" : "none";
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function updateSubtitle() {
+  document.getElementById("subtitle").textContent =
+    VOCAB.length + " words · " +
+    (direction === "cn2en" ? "Chinese → English" : "English → Chinese");
+}
+
+// ---- Toolbar wiring ----
+document.getElementById("btn-flip").addEventListener("click", () => {
+  direction = direction === "cn2en" ? "en2cn" : "cn2en";
+  updateSubtitle();
+  startRound(VOCAB, false);
+});
+document.getElementById("btn-restart").addEventListener("click", () => {
+  allTimeMissed = [];
+  startRound(VOCAB, false);
+});
+document.getElementById("btn-next").addEventListener("click", () => {
+  queue.shift();      // drop the answered word
+  nextQuestion();
+});
+
+// Keyboard: 1-4 to answer, Enter / → for next
+document.addEventListener("keydown", (e) => {
+  if (document.getElementById("quiz-screen").style.display === "none") return;
+  if (!answered && ["1","2","3","4"].includes(e.key)) {
+    const idx = parseInt(e.key, 10) - 1;
+    const buttons = document.getElementById("options").children;
+    if (buttons[idx]) buttons[idx].click();
+  } else if (answered && (e.key === "Enter" || e.key === "ArrowRight")) {
+    document.getElementById("btn-next").click();
+  }
+});
+
+// ---- Boot ----
+updateSubtitle();
+startRound(VOCAB, false);
+</script>
+</body>
+</html>
