@@ -50,9 +50,10 @@
   /* ---------- Tabs ---------- */
   .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
   .tab {
-    flex: 1 1 0; padding: 10px 8px; border: 1.5px solid var(--opt-border);
-    background: var(--opt-bg); color: var(--muted); border-radius: 12px;
-    font: inherit; font-weight: 700; cursor: pointer; line-height: 1.2;
+    flex: 1 1 0; padding: 8px 5px; border: 1.5px solid var(--opt-border);
+    background: var(--opt-bg); color: var(--muted); border-radius: 11px;
+    font: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer; line-height: 1.2;
+    white-space: nowrap;
   }
   .tab.active { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 
@@ -159,6 +160,15 @@
   .fc-cn-s { font-size: 2.2rem; line-height: 1.45; font-weight: 600; word-break: break-word; }
   .fc-en-s { font-size: 1.55rem; line-height: 1.4; font-weight: 600; word-break: break-word; }
   .fc-lesson { font-size: 0.72rem; color: var(--accent); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 4px; }
+  /* Fill-in-the-blank (exam format) */
+  .cloze-sentence { font-size: 2rem; line-height: 1.55; font-weight: 600; word-break: break-word; }
+  .cloze-hint { font-size: 0.95rem; color: var(--muted); margin-top: 6px; }
+  .blank {
+    display: inline-block; min-width: 1.5em; text-align: center; font-weight: 700;
+    border-bottom: 3px solid var(--accent); vertical-align: bottom; line-height: 1.1;
+  }
+  .blank-ok { color: var(--correct-text); border-color: var(--correct-border); }
+  .blank-no { color: var(--wrong-text); border-color: var(--wrong-border); }
   .fc-divider { border: none; border-top: 1px dashed var(--card-border); margin: 8px auto; width: 80%; }
   .fc-controls { text-align: center; }
   .fc-grade { display: flex; gap: 10px; justify-content: center; }
@@ -198,8 +208,9 @@
 
   <!-- Tabs -->
   <div class="tabs">
-    <button class="tab active" id="tab-btn-vocab">📋 Vocabulary</button>
-    <button class="tab" id="tab-btn-book">📖 Whole Book</button>
+    <button class="tab active" id="tab-btn-vocab">📋 Vocab</button>
+    <button class="tab" id="tab-btn-cloze">✏️ Fill-blank</button>
+    <button class="tab" id="tab-btn-book">📖 Sentences</button>
   </div>
 
   <!-- Global controls (apply to both tabs) -->
@@ -248,7 +259,34 @@
     </div>
   </section>
 
-  <!-- ================= TAB 2: WHOLE-BOOK REVIEW (flashcards) ================= -->
+  <!-- ================= TAB 2: FILL-IN-THE-BLANK (exam format) ================= -->
+  <section id="tab-cloze" style="display:none;">
+    <div id="cloze-screen">
+      <div class="progress-row">
+        <span class="mode-tag" id="cl-mode-tag">Fill-in</span>
+        <div class="progress-track"><div class="progress-fill" id="cl-fill"></div></div>
+        <span id="cl-progress"></span>
+      </div>
+      <div class="cloze-mid">
+        <div class="card" id="cl-card"></div>
+        <div class="options" id="cl-options"></div>
+        <div class="feedback" id="cl-feedback"></div>
+      </div>
+      <div class="next-row" id="cl-next-row" style="display:none;">
+        <button class="btn primary" id="cl-next">Next →</button>
+      </div>
+    </div>
+    <div id="cl-results" style="display:none;">
+      <div class="results">
+        <div class="score-big" id="cl-score-big"></div>
+        <div class="score-sub" id="cl-score-sub"></div>
+        <div class="results-actions" id="cl-results-actions"></div>
+        <div id="cl-missed-container"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TAB 3: WHOLE-BOOK REVIEW (flashcards) ================= -->
   <section id="tab-book" style="display:none;">
     <div id="fc-screen">
       <div class="progress-row">
@@ -419,6 +457,43 @@ const BOOK_SENTENCES = [
   { cn: "我很想去那儿。",             py: "wǒ hěn xiǎng qù nàr.",                en: "I really want to go there.",        lesson: 9 },
   { cn: "谢谢你请我吃饭。",           py: "xièxie nǐ qǐng wǒ chīfàn.",           en: "Thank you for treating me to a meal.", lesson: 9 },
   { cn: "不客气。",                   py: "bú kèqi.",                            en: "You're welcome.",                   lesson: 9 }
+];
+
+/* ============================================================
+   FILL-IN-THE-BLANK (exam format) — a sentence with one word
+   removed; the engine shows 4 options (the answer + 3 same-part-
+   of-speech distractors pulled from VOCAB). Each `blank` MUST be
+   a word that exists in VOCAB (for clean distractors).
+   ============================================================ */
+const CLOZE = [
+  { cn: "你是哪国人？",             blank: "哪",     en: "Which country are you from?" },
+  { cn: "我是中国人。",             blank: "人",     en: "I am Chinese." },
+  { cn: "很高兴认识你！",           blank: "很",     en: "Nice to meet you!" },
+  { cn: "你是沙特人吗？",           blank: "是",     en: "Are you Saudi?" },
+  { cn: "你在哪儿？",               blank: "在",     en: "Where are you?" },
+  { cn: "这是阿里。",               blank: "是",     en: "This is Ali." },
+  { cn: "你喜欢吃什么？",           blank: "吃",     en: "What do you like to eat?" },
+  { cn: "我喜欢吃火锅。",           blank: "火锅",   en: "I like to eat hot pot." },
+  { cn: "你喜欢吃中国菜吗？",       blank: "喜欢",   en: "Do you like Chinese food?" },
+  { cn: "这是什么？",               blank: "什么",   en: "What is this?" },
+  { cn: "我不喜欢喝咖啡。",         blank: "喝",     en: "I don't like to drink coffee." },
+  { cn: "我喜欢喝茶。",             blank: "茶",     en: "I like to drink tea." },
+  { cn: "我不喜欢喝奶茶。",         blank: "不",     en: "I don't like to drink milk tea." },
+  { cn: "你有微信吗？",             blank: "有",     en: "Do you have WeChat?" },
+  { cn: "微信很方便。",             blank: "方便",   en: "WeChat is very convenient." },
+  { cn: "我想去超市。",             blank: "想",     en: "I want to go to the supermarket." },
+  { cn: "今天我请你吃饭。",         blank: "吃",     en: "Today I'll treat you to a meal." },
+  { cn: "我和你一起去。",           blank: "去",     en: "I'll go together with you." },
+  { cn: "太好了！",                 blank: "太",     en: "Great! / Wonderful!" },
+  { cn: "她是我的女朋友。",         blank: "女朋友", en: "She is my girlfriend." },
+  { cn: "这是我爸爸，这是我妈妈。", blank: "爸爸",   en: "This is my dad, this is my mom." },
+  { cn: "她很漂亮。",               blank: "很",     en: "She is very beautiful." },
+  { cn: "这儿有商场吗？",           blank: "商场",   en: "Is there a mall here?" },
+  { cn: "商场前面有一个星巴克。",   blank: "前面",   en: "There's a Starbucks in front of the mall." },
+  { cn: "公司后面有一个商场。",     blank: "后面",   en: "There's a mall behind the company." },
+  { cn: "谢谢你请我吃饭。",         blank: "谢谢",   en: "Thank you for treating me to a meal." },
+  { cn: "我也喜欢吃火锅。",         blank: "也",     en: "I also like to eat hot pot." },
+  { cn: "早上好！",                 blank: "早",     en: "Good morning!" }
 ];
 
 /* ============================================================
@@ -629,7 +704,159 @@ function mkBtn(label, cls, onClick) {
 }
 
 /* ============================================================
-   TAB 2 — Flashcard self-test (Whole-Book Review)
+   TAB 2 — Fill-in-the-blank (exam format)
+   ============================================================ */
+let clQueue = [], clRound = [], clMissed = [], clTotal = 0, clDone = 0, clCorrect = 0, clAnswered = false, clDrill = false;
+
+function clOptions(item) {
+  const w = VOCAB.find(v => v.cn === item.blank);
+  const pos = w ? w.pos : null;
+  const pool = VOCAB.filter(v => v.cn !== item.blank);
+  const same = shuffle(pool.filter(v => v.pos === pos));
+  const other = shuffle(pool.filter(v => v.pos !== pos));
+  const ordered = same.concat(other);
+  const opts = [item.blank];
+  const used = new Set([item.blank]);
+  for (const v of ordered) {
+    if (used.has(v.cn)) continue;
+    used.add(v.cn);
+    opts.push(v.cn);
+    if (opts.length === 4) break;
+  }
+  return shuffle(opts);
+}
+
+function clStart(items, drill) {
+  clDrill = !!drill;
+  clRound = (items || CLOZE).slice();
+  clQueue = shuffle(clRound);
+  clMissed = [];
+  clTotal = clRound.length;
+  clDone = 0;
+  clCorrect = 0;
+  document.getElementById("cl-results").style.display = "none";
+  document.getElementById("cloze-screen").style.display = "block";
+  clRender();
+}
+
+function clRender() {
+  clAnswered = false;
+  document.getElementById("cl-feedback").textContent = "";
+  document.getElementById("cl-feedback").className = "feedback";
+  document.getElementById("cl-next-row").style.display = "none";
+  if (clQueue.length === 0) { clResults(); return; }
+  const item = clQueue[0];
+  const blanked = escapeHtml(item.cn).replace(escapeHtml(item.blank), '<span class="blank"></span>');
+  document.getElementById("cl-card").innerHTML =
+    '<div class="cloze-sentence">' + blanked + '</div>' +
+    '<div class="cloze-hint">' + escapeHtml(item.en) + '</div>';
+  const box = document.getElementById("cl-options");
+  box.innerHTML = "";
+  clOptions(item).forEach((cn, i) => {
+    const btn = document.createElement("button");
+    btn.className = "opt";
+    btn.type = "button";
+    if (cn === item.blank) btn.dataset.correct = "1";
+    btn.innerHTML = '<span class="num">' + (i + 1) + '</span><span class="label-cn">' + escapeHtml(cn) + '</span>';
+    btn.addEventListener("click", () => clAnswer(btn, cn, item));
+    box.appendChild(btn);
+  });
+  clProgress();
+}
+
+function clProgress() {
+  const pct = clTotal === 0 ? 0 : Math.round((clDone / clTotal) * 100);
+  document.getElementById("cl-fill").style.width = pct + "%";
+  document.getElementById("cl-progress").textContent = clDone + " / " + clTotal;
+}
+
+function clAnswer(btn, chosen, item) {
+  if (clAnswered) return;
+  clAnswered = true;
+  clDone++;
+  Array.from(document.getElementById("cl-options").children).forEach(b => b.disabled = true);
+  const right = chosen === item.blank;
+  const w = VOCAB.find(v => v.cn === item.blank);
+  const py = w ? w.py : "";
+  const blankEl = document.querySelector("#cl-card .blank");
+  if (blankEl) { blankEl.textContent = item.blank; blankEl.classList.add(right ? "blank-ok" : "blank-no"); }
+  const fb = document.getElementById("cl-feedback");
+  if (right) {
+    btn.classList.add("correct");
+    clCorrect++;
+    fb.innerHTML = "Correct ✓ &nbsp; <strong>" + escapeHtml(item.blank) + "</strong> · " + escapeHtml(py);
+    fb.className = "feedback ok";
+  } else {
+    btn.classList.add("wrong");
+    Array.from(document.getElementById("cl-options").children).forEach(b => { if (b.dataset.correct === "1") b.classList.add("correct"); });
+    fb.innerHTML = "Answer: <strong>" + escapeHtml(item.blank) + "</strong> · " + escapeHtml(py);
+    fb.className = "feedback no";
+    clMissed.push(item);
+  }
+  document.getElementById("cl-next-row").style.display = "block";
+  clProgress();
+}
+
+function clUniqueMissed() {
+  const seen = new Set(), out = [];
+  for (const it of clMissed) {
+    const k = it.cn + "|" + it.blank;
+    if (!seen.has(k)) { seen.add(k); out.push(it); }
+  }
+  return out;
+}
+
+function clResults() {
+  document.getElementById("cloze-screen").style.display = "none";
+  document.getElementById("cl-results").style.display = "block";
+  const pct = clTotal === 0 ? 100 : Math.round((clCorrect / clTotal) * 100);
+  document.getElementById("cl-score-big").textContent = pct + "%";
+  document.getElementById("cl-score-sub").textContent =
+    clCorrect + " of " + clTotal + " correct" + (clDrill ? " (drill round)" : "");
+  const actions = document.getElementById("cl-results-actions");
+  actions.innerHTML = "";
+  const cont = document.getElementById("cl-missed-container");
+  cont.innerHTML = "";
+  if (clMissed.length === 0) {
+    const d = document.createElement("div");
+    d.className = "perfect";
+    d.innerHTML = '<span class="clean-badge">✓ ' + (clDrill ? "Clean round — all mastered!" : "Perfect — no mistakes!") + '</span>';
+    cont.appendChild(d);
+    actions.appendChild(mkBtn("Restart", "primary", () => clStart(CLOZE, false)));
+  } else {
+    const miss = clUniqueMissed();
+    actions.appendChild(mkBtn("Drill these (" + miss.length + ")", "primary", () => clStart(miss, true)));
+    actions.appendChild(mkBtn("Restart all", "", () => clStart(CLOZE, false)));
+    clRenderMissed(cont, miss);
+  }
+}
+
+function clRenderMissed(container, items) {
+  const list = document.createElement("div");
+  list.className = "missed-list";
+  const head = document.createElement("div");
+  head.className = "head";
+  head.textContent = "Review (" + items.length + ")";
+  list.appendChild(head);
+  items.forEach(it => {
+    const w = VOCAB.find(v => v.cn === it.blank);
+    const py = w ? w.py : "";
+    const filled = escapeHtml(it.cn).replace(escapeHtml(it.blank),
+      '<b style="color:var(--accent)">' + escapeHtml(it.blank) + '</b>');
+    const row = document.createElement("div");
+    row.className = "missed-row";
+    row.style.gridTemplateColumns = "1fr";
+    row.innerHTML =
+      '<div class="mc-cn" style="font-size:1.4rem">' + filled + '</div>' +
+      '<div class="mc-meta"><span class="py fb-py">' + escapeHtml(py) + '</span> — ' +
+      '<span class="en">' + escapeHtml(it.en) + '</span></div>';
+    list.appendChild(row);
+  });
+  container.appendChild(list);
+}
+
+/* ============================================================
+   TAB 3 — Flashcard self-test (Whole-Book Review)
    ============================================================ */
 let fcDeck = [], fcNext = [], fcIndex = 0, fcMastered = 0, fcTotal = 0, fcRevealed = false;
 
@@ -712,11 +939,11 @@ function fcFinish() {
    ============================================================ */
 function showTab(name) {
   currentTab = name;
-  const isVocab = name === "vocab";
-  document.getElementById("tab-vocab").style.display = isVocab ? "block" : "none";
-  document.getElementById("tab-book").style.display = isVocab ? "none" : "block";
-  document.getElementById("tab-btn-vocab").classList.toggle("active", isVocab);
-  document.getElementById("tab-btn-book").classList.toggle("active", !isVocab);
+  const map = { vocab: "tab-vocab", cloze: "tab-cloze", book: "tab-book" };
+  for (const [key, id] of Object.entries(map)) {
+    document.getElementById(id).style.display = (key === name) ? "block" : "none";
+    document.getElementById("tab-btn-" + key).classList.toggle("active", key === name);
+  }
 }
 
 function updateFlipLabel() {
@@ -733,13 +960,16 @@ function updatePinyinLabel() {
 
 // Tabs
 document.getElementById("tab-btn-vocab").addEventListener("click", () => showTab("vocab"));
+document.getElementById("tab-btn-cloze").addEventListener("click", () => showTab("cloze"));
 document.getElementById("tab-btn-book").addEventListener("click", () => showTab("book"));
 
-// Direction (shared) — restart the active tab so prompts switch
+// Direction (shared) — restart the active tab so prompts switch.
+// (Fill-in-the-blank is always Chinese sentence + Chinese options, so direction doesn't apply there.)
 document.getElementById("btn-flip").addEventListener("click", () => {
   direction = direction === "cn2en" ? "en2cn" : "cn2en";
   updateFlipLabel();
-  if (currentTab === "vocab") startRound(VOCAB, false); else fcStart();
+  if (currentTab === "vocab") startRound(VOCAB, false);
+  else if (currentTab === "book") fcStart();
 });
 
 // Pinyin show/hide (global, instant via body class — no reset)
@@ -770,9 +1000,12 @@ document.getElementById("btn-copy").addEventListener("click", async () => {
 
 // Restart (tab-aware): restarts whichever tab is active
 document.getElementById("btn-restart").addEventListener("click", () => {
-  if (currentTab === "vocab") startRound(VOCAB, false); else fcStart();
+  if (currentTab === "vocab") startRound(VOCAB, false);
+  else if (currentTab === "cloze") clStart(CLOZE, false);
+  else fcStart();
 });
 document.getElementById("btn-next").addEventListener("click", () => { queue.shift(); nextQuestion(); });
+document.getElementById("cl-next").addEventListener("click", () => { clQueue.shift(); clRender(); });
 
 // Flashcard controls
 document.getElementById("fc-show").addEventListener("click", fcReveal);
@@ -790,6 +1023,14 @@ document.addEventListener("keydown", (e) => {
     } else if (answered && (e.key === "Enter" || e.key === "ArrowRight")) {
       document.getElementById("btn-next").click();
     }
+  } else if (currentTab === "cloze") {
+    if (document.getElementById("cloze-screen").style.display === "none") return;
+    if (!clAnswered && ["1","2","3","4"].includes(e.key)) {
+      const b = document.getElementById("cl-options").children[parseInt(e.key,10)-1];
+      if (b) b.click();
+    } else if (clAnswered && (e.key === "Enter" || e.key === "ArrowRight")) {
+      document.getElementById("cl-next").click();
+    }
   } else {
     if (document.getElementById("fc-screen").style.display === "none") return;
     if (!fcRevealed && (e.key === " " || e.key === "Enter")) { e.preventDefault(); fcReveal(); }
@@ -803,6 +1044,7 @@ updateFlipLabel();
 updatePinyinLabel();
 showTab("vocab");
 startRound(VOCAB, false);
+clStart(CLOZE, false);
 fcStart();
 </script>
 </body>
