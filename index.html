@@ -78,6 +78,36 @@
     flex: 0 0 auto;
   }
 
+  /* ---------- Share / QR panel ---------- */
+  #share-panel { margin: 0 0 18px; }
+  .share-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 18px;
+    text-align: center;
+  }
+  .share-title { font-weight: 700; margin-bottom: 12px; }
+  .qr {
+    width: 220px;
+    max-width: 70vw;
+    height: auto;
+    image-rendering: pixelated;   /* keep QR crisp when scaled up */
+    background: #fff;             /* light quiet zone so it scans in dark mode */
+    padding: 8px;
+    border-radius: 8px;
+  }
+  .share-link {
+    display: block;
+    margin: 12px 0;
+    color: var(--accent);
+    font-weight: 600;
+    word-break: break-all;
+    text-decoration: none;
+  }
+  .share-link:hover { text-decoration: underline; }
+
   /* ---------- Progress bar ---------- */
   .progress-row {
     display: flex;
@@ -266,6 +296,17 @@
   <div class="toolbar">
     <button class="btn" id="btn-flip">Flip direction</button>
     <button class="btn" id="btn-restart">Restart all words</button>
+    <button class="btn" id="btn-share">Share / QR</button>
+  </div>
+
+  <!-- Share panel (toggled by the Share button) -->
+  <div id="share-panel" style="display:none;">
+    <div class="share-card">
+      <div class="share-title">Scan to open on your phone</div>
+      <img class="qr" alt="QR code that opens this quiz" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASgAAAEoAQMAAADRyf5aAAAABlBMVEURERH////YdsArAAABfUlEQVR42u2ayw7CMAwELf7/nw0ifsVxASFuTJGqVITLyN6st4h+cgm72PXtLlnXc/l4WL+UdVvf6E0+uf5hlzjYJyrjFtAcKbw2XkbJVguexjO8Zl7eiFZmqvB6XV8GSSTFDV7X+pUa5vDQr5FXnI/Hh/Nx4LU5kFVi3ZDAa+/Hw4KlFaO+zvoScYsqtTlT/OG165fJu+m9OzDnB6/GSzXl3SgFKvzEoPepVM7OZA29n/3EZuxXmbmlgFevLxP7oxVTzeDV+jHsanjVyHrQr6O+ZO/DnLxdwODV9d4BaY91qK/Br6bYl0WZjuDV+nFTK5sm49CEV8+/avoV9it6E14Hr5i0XeHD+uMnhnxCtYPztVJfQ31tAYVHOYUZvPZ5O++pXpHsUF+H/9KagrmlCEMBr2PeLhmYmwopkxG8ut6HNZWywH9d6r3zEhd7FebH97ykRDol4IHXwCveqJUomvdD1/oVaaoN3fB6ez7mS+06U8Jr9F/8c5BdP991B1LhIxAoxQW/AAAAAElFTkSuQmCC">
+      <a class="share-link" id="share-link" href="https://ansaaj1990.github.io/chinese-book1-quiz/" target="_blank" rel="noopener">https://ansaaj1990.github.io/chinese-book1-quiz/</a>
+      <button class="btn primary" id="btn-copy">Copy link</button>
+    </div>
   </div>
 
   <!-- Quiz screen -->
@@ -650,6 +691,31 @@ function updateSubtitle() {
 }
 
 // ---- Toolbar wiring ----
+const QUIZ_URL = "https://ansaaj1990.github.io/chinese-book1-quiz/";
+document.getElementById("btn-share").addEventListener("click", () => {
+  const p = document.getElementById("share-panel");
+  p.style.display = p.style.display === "none" ? "block" : "none";
+});
+document.getElementById("btn-copy").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-copy");
+  let ok = false;
+  try {
+    await navigator.clipboard.writeText(QUIZ_URL);
+    ok = true;
+  } catch (e) {
+    // Fallback for non-secure contexts (e.g. opened via file://)
+    const ta = document.createElement("textarea");
+    ta.value = QUIZ_URL;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { ok = document.execCommand("copy"); } catch (_) { ok = false; }
+    document.body.removeChild(ta);
+  }
+  btn.textContent = ok ? "Copied!" : "Copy failed — long-press the link";
+  setTimeout(() => { btn.textContent = "Copy link"; }, 1800);
+});
 document.getElementById("btn-flip").addEventListener("click", () => {
   direction = direction === "cn2en" ? "en2cn" : "cn2en";
   updateSubtitle();
