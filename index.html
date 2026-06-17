@@ -25,12 +25,24 @@
     }
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
+  html, body { margin: 0; padding: 0; height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg); color: var(--text); line-height: 1.5; -webkit-text-size-adjust: 100%;
   }
-  .wrap { max-width: 680px; margin: 0 auto; padding: 10px 14px 14px; }
+  /* Full-height flex column so the active view fits the screen — only the
+     card/options area scrolls if a question is taller than the viewport. */
+  .wrap {
+    max-width: 680px; margin: 0 auto; padding: 8px 14px;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  header, .tabs, .toolbar { flex: 0 0 auto; }
+  section#tab-vocab, section#tab-book { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  #quiz-screen, #fc-screen { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+  .quiz-mid, .fc-mid { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  .next-row, .fc-controls { flex: 0 0 auto; }
+  #results-screen, #fc-done { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
   header { text-align: center; margin: 2px 0 8px; }
   header h1 { font-size: 1.05rem; margin: 0 0 2px; font-weight: 700; }
@@ -69,9 +81,8 @@
 
   /* ---------- Progress bar ---------- */
   .progress-row {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-    font-size: 0.85rem; color: var(--muted);
-    position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 8px 0;
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    font-size: 0.85rem; color: var(--muted); padding: 4px 0;
   }
   .progress-track { flex: 1; height: 8px; background: var(--card-border); border-radius: 99px; overflow: hidden; }
   .progress-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.25s ease; }
@@ -116,7 +127,7 @@
   button.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
   button.btn.primary:hover { filter: brightness(1.06); background: var(--accent); }
 
-  .next-row { margin-top: 8px; text-align: center; position: sticky; bottom: 0; z-index: 5; background: var(--bg); padding: 8px 0 4px; }
+  .next-row { margin-top: 8px; text-align: center; padding: 6px 0 2px; }
   #btn-next { width: 100%; max-width: 340px; padding: 13px 16px; font-size: 1.05rem; }
   .feedback { text-align: center; font-weight: 600; min-height: 1.3em; margin-top: 8px; }
   .feedback.ok { color: var(--correct-text); }
@@ -177,20 +188,20 @@
 <div class="wrap">
   <header>
     <h1>Chinese Book 1 — Review</h1>
-    <div class="sub" id="subtitle"></div>
   </header>
 
   <!-- Tabs -->
   <div class="tabs">
-    <button class="tab active" id="tab-btn-vocab">📋 Vocabulary Review</button>
-    <button class="tab" id="tab-btn-book">📖 Whole-Book Review</button>
+    <button class="tab active" id="tab-btn-vocab">📋 Vocabulary</button>
+    <button class="tab" id="tab-btn-book">📖 Whole Book</button>
   </div>
 
   <!-- Global controls (apply to both tabs) -->
   <div class="toolbar">
     <button class="btn" id="btn-flip" title="Tap to switch quiz direction"></button>
     <button class="btn" id="btn-pinyin" title="Show or hide pinyin"></button>
-    <button class="btn" id="btn-share">Share / QR</button>
+    <button class="btn" id="btn-restart" title="Restart this tab">↻ Restart</button>
+    <button class="btn" id="btn-share">Share</button>
   </div>
 
   <!-- Share panel -->
@@ -205,17 +216,17 @@
 
   <!-- ================= TAB 1: VOCABULARY REVIEW (multiple choice) ================= -->
   <section id="tab-vocab">
-    <div class="toolbar"><button class="btn" id="btn-restart">↻ Restart all words</button></div>
-
     <div id="quiz-screen">
       <div class="progress-row">
         <span class="mode-tag" id="mode-tag"></span>
         <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
         <span id="progress-text"></span>
       </div>
-      <div class="card" id="prompt-card"></div>
-      <div class="options" id="options"></div>
-      <div class="feedback" id="feedback"></div>
+      <div class="quiz-mid">
+        <div class="card" id="prompt-card"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+      </div>
       <div class="next-row" id="next-row" style="display:none;">
         <button class="btn primary" id="btn-next">Next →</button>
       </div>
@@ -233,20 +244,13 @@
 
   <!-- ================= TAB 2: WHOLE-BOOK REVIEW (flashcards) ================= -->
   <section id="tab-book" style="display:none;">
-    <div class="toolbar"><button class="btn" id="fc-restart">↻ Restart / Shuffle</button></div>
-    <div class="note" id="book-note">
-      Flashcard self-test over the current word list. Tap <b>Show answer</b>, then mark
-      <b>Got it</b> or <b>Review again</b> — missed cards come back until you know them all.
-      <br>(Once you send the full book pages, this tab will also cover grammar, phrases &amp; dialogues.)
-    </div>
-
     <div id="fc-screen">
       <div class="progress-row">
         <span class="mode-tag">Flashcards</span>
         <div class="progress-track"><div class="progress-fill" id="fc-fill"></div></div>
         <span id="fc-progress"></span>
       </div>
-      <div class="card fc-card" id="fc-card"></div>
+      <div class="fc-mid"><div class="card fc-card" id="fc-card"></div></div>
       <div class="fc-controls">
         <button class="btn primary" id="fc-show">Show answer</button>
         <div class="fc-grade" id="fc-grade" style="display:none;">
@@ -657,8 +661,6 @@ function showTab(name) {
   document.getElementById("tab-btn-book").classList.toggle("active", !isVocab);
 }
 
-function updateSubtitle() { document.getElementById("subtitle").textContent = VOCAB.length + " words · Chinese Book 1 (A1)"; }
-
 function updateFlipLabel() {
   const b = document.getElementById("btn-flip");
   b.innerHTML = (direction === "cn2en" ? "中文 &rarr; English" : "English &rarr; 中文") + ' <span class="swap">⇄</span>';
@@ -708,15 +710,16 @@ document.getElementById("btn-copy").addEventListener("click", async () => {
   setTimeout(() => { btn.textContent = "Copy link"; }, 1800);
 });
 
-// Quiz controls
-document.getElementById("btn-restart").addEventListener("click", () => startRound(VOCAB, false));
+// Restart (tab-aware): restarts whichever tab is active
+document.getElementById("btn-restart").addEventListener("click", () => {
+  if (currentTab === "vocab") startRound(VOCAB, false); else fcStart();
+});
 document.getElementById("btn-next").addEventListener("click", () => { queue.shift(); nextQuestion(); });
 
 // Flashcard controls
 document.getElementById("fc-show").addEventListener("click", fcReveal);
 document.getElementById("fc-got").addEventListener("click", () => fcGrade(true));
 document.getElementById("fc-again").addEventListener("click", () => fcGrade(false));
-document.getElementById("fc-restart").addEventListener("click", fcStart);
 document.getElementById("fc-again-all").addEventListener("click", fcStart);
 
 // Keyboard
@@ -738,7 +741,6 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ---- Boot ----
-updateSubtitle();
 updateFlipLabel();
 updatePinyinLabel();
 showTab("vocab");
